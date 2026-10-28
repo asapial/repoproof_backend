@@ -2,12 +2,12 @@
   "manifestVersion": 1,
   "fixtureKey": "discount-bug",
   "origin": "CURATED",
-  "status": "IN_PROGRESS",
+  "status": "DONE",
   "repository": "repoproof_backend",
-  "pinnedBaseSha": "f56bcb6d6dbae99b0805ac8b6c7162e6994447bc",
+  "pinnedBaseSha": "1066351c5b07bed024775a16af9151048a9316b2",
   "issue": {
-    "status": "UNPUBLISHED_DRAFT",
-    "url": null,
+    "status": "PUBLISHED",
+    "url": "https://github.com/asapial/repoproof_backend/issues/1",
     "title": "Percentage discounts increase the price",
     "input": {
       "price": 100,
@@ -46,7 +46,7 @@
     "reference/manual-fix.patch": "81cb9fbe8ac7409b42db302849d000cfb70a35c199272c461a3a2c7a1767a570"
   },
   "executionEvidence": {
-    "scope": "manual reference patch; no AI or policy verdict",
+    "scope": "Manual reference patch against clean candidate checkout; no AI or policy verdict",
     "runner": "Docker Desktop Linux VM; no network; read-only filesystem and fixture mount; non-root; all capabilities dropped; no-new-privileges; CPU, memory and PID limits",
     "testReporter": "node:test TAP",
     "baselineIssue": {
@@ -80,11 +80,12 @@
       "skipped": 0,
       "exitCode": 0
     },
-    "patchedSourceSha256": "6cd2987d27c0c1bf3a4e13766bc823dfbd34c61f676278f95f39147e7e7bb0b8",
+    "patchedSourceSha256": "5892e884fd0ec0d7fc059821736ad16a015abe79dc72bdc4fcd0263b4bb32116",
     "issueTestSha256": "cedda8bd3a847c877011eeb96391924c66d5adfa49cb2e68d5e3adc2be64962a",
     "limitations": [
-      "No GitHub issue URL verified or published",
-      "Vitest JSON evidence required by recovered plan is not available; these results use node:test TAP",
+      "RPF-002 owner approved genuine Node TAP instead of the recovered plan’s Vitest JSON; no Vitest JSON is claimed",
+      "Public-base and candidate TypeScript checks produced the same 14 pre-existing diagnostics; complete public-base typecheck did not pass",
+      "Reference patch is a local tracking artifact and is not in the public baseline",
       "No Meta patch, orchestrator, independent production runner, or policy verdict was exercised"
     ]
   },
