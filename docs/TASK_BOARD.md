@@ -12,7 +12,14 @@ Status options: `TODO`, `IN_PROGRESS`, `BLOCKED`, `DONE`, `DEFERRED`. Edit one t
 | --- | --- | --- | --- | --- | --- |
 | RPF-001A | frontend | TODO | - | Verify or establish quality gates for EXISTING frontend: TypeScript, lint, tests and build using real scripts; preserve current app | - |
 | RPF-001B | backend | DONE | - | Existing backend quality gates verified; JWT negative tests added | 05fd51f297c69cbb1659c28c2dd64df2f00d0c81; npm run lint and typecheck passed; npm test -- --maxWorkers=1: 9 passed (7 in untracked RPF-001C tests, 2 committed JWT tests); isolated copy excluding RPF-001C: lint, typecheck, 2 JWT tests and build passed; git diff --check passed |
-| RPF-001C | backend | IN_PROGRESS | RPF-001B | Backend-owned API contract/DTO strategy, runtime validation, versioning and documented frontend compatibility checks; do not force monorepo sharing | Backend contracts: this commit; contract tests 14 passed, full suite 16 passed, lint/typecheck/build passed; frontend integration pending |
+| RPF-001C | backend | IN_PROGRESS | RPF-001B | Backend-owned API contract/DTO strategy, runtime validation, versioning and documented frontend compatibility checks; do not force monorepo sharing | Backend `97a2c52ba6827ccd0f25a06f1933d3865f9bc44c`; frontend `e9a4a6e267b3e2f3c4b3dcaa881de00f2414ed86`. Contract snapshot matches backend commit; backend contract tests 14/14 and full suite 16/16; frontend tests 6/6. Both commits report lint, typecheck and isolated build passed. Live endpoint integration remains unverified; see evidence below. |
+
+### RPF-001C reconciliation evidence
+
+- Rechecked the frontend commit-pinned byte comparison against both backend contract files and reran the backend and frontend tests above; all passed with no skips. The checks validate proposed DTOs with sample data, not live HTTP integration.
+- The backend commit records ESLint, typecheck, isolated production build, diff checks, and staged secret review. The frontend commit records the same gates and its compatibility check. These are commit-time results; builds and lint were not rerun during this documentation reconciliation.
+- `/api/v1` business run routes are not implemented. Actual frontend-to-backend request, response, authorization, and error-envelope compatibility remains unverified until those endpoints and consumers exist. Existing backend errors differ from the proposed v1 envelope. Repository and issue lists, cancellation responses, and history lack finalized DTO shapes. Keep RPF-001C IN_PROGRESS pending integration proof; later run API work is tracked by RPF-012A/RPF-012B.
+- `RPF-SEC-001` remains a separate P0 security issue. The contract checks do not resolve or test CSRF, cookie, or CORS concerns.
 
 ## Existing RepoProof v2 backlog (preserve original RPF ticket meaning)
 
