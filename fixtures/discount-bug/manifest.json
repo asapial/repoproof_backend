@@ -4,7 +4,7 @@
   "origin": "CURATED",
   "status": "IN_PROGRESS",
   "repository": "repoproof_backend",
-  "pinnedBaseSha": null,
+  "pinnedBaseSha": "f56bcb6d6dbae99b0805ac8b6c7162e6994447bc",
   "issue": {
     "status": "UNPUBLISHED_DRAFT",
     "url": null,
@@ -37,7 +37,7 @@
   "allowedPatchPaths": [
     "src/discount.mjs"
   ],
-  "frozenIssueTest": null,
+  "frozenIssueTest": "tests/issue.mjs",
   "referencePatch": "reference/manual-fix.patch",
   "sha256": {
     "src/discount.mjs": "8039e5c7c1adcc2b03f13b3aa6f66979bb916501ce2f7365b33ab4cb7e241825",
@@ -45,6 +45,48 @@
     "tests/regression.mjs": "5cb2dcd4fbabecccc32c73d3cc041977ede0b36f5f2901e950607f08f5c0f82e",
     "reference/manual-fix.patch": "81cb9fbe8ac7409b42db302849d000cfb70a35c199272c461a3a2c7a1767a570"
   },
-  "executionEvidence": null,
+  "executionEvidence": {
+    "scope": "manual reference patch; no AI or policy verdict",
+    "runner": "Docker Desktop Linux VM; no network; read-only filesystem and fixture mount; non-root; all capabilities dropped; no-new-privileges; CPU, memory and PID limits",
+    "testReporter": "node:test TAP",
+    "baselineIssue": {
+      "tests": 1,
+      "passed": 0,
+      "failed": 1,
+      "skipped": 0,
+      "exitCode": 1,
+      "errorCode": "ERR_ASSERTION",
+      "actual": 120,
+      "expected": 80
+    },
+    "baselineRegressions": {
+      "tests": 2,
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0,
+      "exitCode": 0
+    },
+    "patchedIssue": {
+      "tests": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "exitCode": 0
+    },
+    "patchedRegressions": {
+      "tests": 2,
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0,
+      "exitCode": 0
+    },
+    "patchedSourceSha256": "6cd2987d27c0c1bf3a4e13766bc823dfbd34c61f676278f95f39147e7e7bb0b8",
+    "issueTestSha256": "cedda8bd3a847c877011eeb96391924c66d5adfa49cb2e68d5e3adc2be64962a",
+    "limitations": [
+      "No GitHub issue URL verified or published",
+      "Vitest JSON evidence required by recovered plan is not available; these results use node:test TAP",
+      "No Meta patch, orchestrator, independent production runner, or policy verdict was exercised"
+    ]
+  },
   "issueTest": "tests/issue.mjs"
 }

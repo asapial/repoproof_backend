@@ -25,8 +25,8 @@ Status options: `TODO`, `IN_PROGRESS`, `BLOCKED`, `DONE`, `DEFERRED`. Edit one t
 
 | Ticket | Repo | Status | Depends | Acceptance evidence / meaning | Code SHA / checks |
 | --- | --- | --- | --- | --- | --- |
-| RPF-010A | backend | DONE | RPF-001B | Pure verdict policy and negative tests reject false VERIFIED results | This commit; policy tests 10 passed, full suite 30 passed; ESLint, typecheck, isolated build and diff checks passed. Synthetic evidence only; trusted runner integration remains RPF-010B. |
-| RPF-002 | backend | TODO | RPF-001B | Owned pinned JS/TS fixture, real failing issue test, known manual fix | - |
+| RPF-010A | backend | DONE | RPF-001B | Pure verdict policy and negative tests reject false VERIFIED results | b8052796c5db8610368d74e9928938ed9b5eb97d; policy tests 10 passed, full suite 30 passed; ESLint, typecheck, isolated build and diff checks passed. Synthetic evidence only; trusted runner integration remains RPF-010B. |
+| RPF-002 | backend | IN_PROGRESS | RPF-001B | Owned pinned JS/TS fixture, real failing issue test, known manual fix | Baseline `f56bcb6d6dbae99b0805ac8b6c7162e6994447bc`: issue assertion 120 != 80; regressions 2 passed; reference fix: issue 1 and regressions 2 passed with unchanged test hash. Isolated Node TAP evidence recorded in manifest. GitHub issue URL unverified and recovered plan requires Vitest JSON; both remain open. Backend suite 30 passed, lint/typecheck/build passed. |
 | RPF-003 | backend | TODO | RPF-001B | Real Meta API adapter smoke when credentials/budget approved; structured errors and secret safety | - |
 | RPF-004 | backend | TODO | RPF-002 | Separate isolated allowlisted fixture runner; fixed commands, timeouts, cleanup | - |
 | RPF-005 | backend | TODO | RPF-004 | Structured test results parse executed/skipped/failure and malformed JSON | - |
