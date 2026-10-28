@@ -1,0 +1,50 @@
+{
+  "manifestVersion": 1,
+  "fixtureKey": "discount-bug",
+  "origin": "CURATED",
+  "status": "IN_PROGRESS",
+  "repository": "repoproof_backend",
+  "pinnedBaseSha": null,
+  "issue": {
+    "status": "UNPUBLISHED_DRAFT",
+    "url": null,
+    "title": "Percentage discounts increase the price",
+    "input": {
+      "price": 100,
+      "percentage": 20
+    },
+    "expected": 80,
+    "buggyResultByInspection": 120
+  },
+  "runtime": {
+    "name": "node",
+    "version": "20.20.2",
+    "dependencies": "none",
+    "containerImage": "node@sha256:fb4cd12c85ee03686f6af5362a0b0d56d50c58a04632e6c0fb8363f609372293"
+  },
+  "commands": {
+    "issue": [
+      "node",
+      "--test",
+      "tests/issue.mjs"
+    ],
+    "regressions": [
+      "node",
+      "--test",
+      "tests/regression.mjs"
+    ]
+  },
+  "allowedPatchPaths": [
+    "src/discount.mjs"
+  ],
+  "frozenIssueTest": null,
+  "referencePatch": "reference/manual-fix.patch",
+  "sha256": {
+    "src/discount.mjs": "8039e5c7c1adcc2b03f13b3aa6f66979bb916501ce2f7365b33ab4cb7e241825",
+    "tests/issue.mjs": "cedda8bd3a847c877011eeb96391924c66d5adfa49cb2e68d5e3adc2be64962a",
+    "tests/regression.mjs": "5cb2dcd4fbabecccc32c73d3cc041977ede0b36f5f2901e950607f08f5c0f82e",
+    "reference/manual-fix.patch": "81cb9fbe8ac7409b42db302849d000cfb70a35c199272c461a3a2c7a1767a570"
+  },
+  "executionEvidence": null,
+  "issueTest": "tests/issue.mjs"
+}
