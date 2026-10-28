@@ -25,7 +25,7 @@ Status options: `TODO`, `IN_PROGRESS`, `BLOCKED`, `DONE`, `DEFERRED`. Edit one t
 
 | Ticket | Repo | Status | Depends | Acceptance evidence / meaning | Code SHA / checks |
 | --- | --- | --- | --- | --- | --- |
-| RPF-010A | backend | TODO | RPF-001B | Pure verdict policy and negative tests reject false VERIFIED results | - |
+| RPF-010A | backend | DONE | RPF-001B | Pure verdict policy and negative tests reject false VERIFIED results | This commit; policy tests 10 passed, full suite 30 passed; ESLint, typecheck, isolated build and diff checks passed. Synthetic evidence only; trusted runner integration remains RPF-010B. |
 | RPF-002 | backend | TODO | RPF-001B | Owned pinned JS/TS fixture, real failing issue test, known manual fix | - |
 | RPF-003 | backend | TODO | RPF-001B | Real Meta API adapter smoke when credentials/budget approved; structured errors and secret safety | - |
 | RPF-004 | backend | TODO | RPF-002 | Separate isolated allowlisted fixture runner; fixed commands, timeouts, cleanup | - |
@@ -48,7 +48,7 @@ Status options: `TODO`, `IN_PROGRESS`, `BLOCKED`, `DONE`, `DEFERRED`. Edit one t
 
 ## Pending security issue
 
-- **RPF-SEC-001 — P0 DONE: authentication and cookie security.** Better Auth CSRF and origin checks are enabled; cookies are HttpOnly with environment-appropriate Secure/SameSite/Path attributes; CORS uses explicit configured origins. This commit: full suite 20 passed; Prisma-backed registration, login, failed login, session, logout, CSRF, both cookie modes and CORS passed against the confirmed disposable test database; synthetic data removed. Migration status, ESLint, typecheck, isolated production build and diff checks passed. Deployed browser, OAuth and future frontend proxy integration remain unverified; see `docs/AUTH_SECURITY.md`.
+- **RPF-SEC-001 — P0 DONE: authentication and cookie security.** Better Auth CSRF and origin checks are enabled; cookies are HttpOnly with environment-appropriate Secure/SameSite/Path attributes; CORS uses explicit configured origins. `fbf59b76c830c68306507bb1e28e3801c3b8c2b9`: full suite 20 passed; Prisma-backed registration, login, failed login, session, logout, CSRF, both cookie modes and CORS passed against the confirmed disposable test database; synthetic data removed. Migration status, ESLint, typecheck, isolated production build and diff checks passed. Deployed browser, OAuth and future frontend proxy integration remain unverified; see `docs/AUTH_SECURITY.md`.
 
 ## Cross-repo tracking rules
 

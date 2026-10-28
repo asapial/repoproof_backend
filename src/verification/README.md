@@ -1,0 +1,7 @@
+# Verdict policy boundary
+
+`decideVerdict` is a pure, server-side policy over evidence assembled by a trusted controller. It does not authenticate callers, execute tests, enforce patch restrictions, attest runner isolation, or establish whether submitted evidence is genuine. Never pass client or model claims directly into it. RPF-010B must supply authenticated, independently collected artifact and execution data and a server-owned required check list.
+
+The policy hashes the supplied frozen bytes and compares the digest to both issue executions. It requires a pinned base SHA, test ID, ordered freeze/baseline/patch/retest sequence, positive test counts, no skipped tests, matching runner and command digests, and every required baseline and patched check. It rejects detected tampering and genuine failed patches or checks; missing, malformed, inconsistent, setup or timeout evidence is inconclusive. A passing baseline is `NO_REPRO` only when no patch has been attempted. Reference strings identify supplied evidence; they are not proof of artifact authenticity.
+
+Decision precedence is malformed input, detected tampering, baseline validity and no-repro, patch policy, baseline checks, patched issue test, then patched checks. The policy returns a version, reason code and ordered evidence references. Passing unit tests use synthetic evidence; they do not demonstrate a real isolated runner or integrated verification pipeline.
