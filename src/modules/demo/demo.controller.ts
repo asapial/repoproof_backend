@@ -18,7 +18,7 @@ const getDemo = catchAsync(async (req: Request, res: Response) => {
 
 
 
-const demoController={
+export const demoController={
 
     getDemo
 }

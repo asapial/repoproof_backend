@@ -1,5 +1,4 @@
 import { Response } from "express"
-import { HttpStatus } from "http-status";
 
 interface IResponseData<T> {
     status:number;

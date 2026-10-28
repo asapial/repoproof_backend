@@ -1,4 +1,3 @@
-import { success } from "better-auth";
 import jwt, { JwtPayload, SignOptions } from "jsonwebtoken";
 
 
@@ -18,11 +17,11 @@ const vefifyToken=(token:string,secret:string)=>{
             success:true,
             data:decoded
         }
-    } catch (error:any) {
+    } catch (error: unknown) {
         
         return{
             success:false,
-            message:error.message,
+            message:error instanceof Error ? error.message : String(error),
             error
         }
     }

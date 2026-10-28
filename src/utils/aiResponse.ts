@@ -229,7 +229,7 @@ export async function getAiResponse<T = unknown>(
   // All models and retries exhausted
   return {
     success: false,
-    model: modelsToTry[modelsToTry.length - 1],
+    model: modelsToTry[modelsToTry.length - 1] ?? "",
     data: null,
     error: `All models failed. Last error: ${lastError}`,
   };

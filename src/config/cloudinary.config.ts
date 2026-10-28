@@ -28,8 +28,7 @@ export const uploadFileToCloudinary = async (
         .join(".")
         .toLowerCase()
         .replace(/\s+/g, "-")
-        // eslint-disable-next-line no-useless-escape
-        .replace(/[^a-z0-9\-]/g, "");
+        .replace(/[^a-z0-9-]/g, "");
 
     const uniqueName =
         Math.random().toString(36).substring(2) +

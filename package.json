@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "vitest run",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
     "test:ai": "npx tsx src/scripts/testAiResponse.ts",
     "dev": "npx tsx watch src/server.ts",
     "seeding": "npx tsx src/scripts/seedingAdmin.ts",
@@ -27,7 +29,10 @@
     "prisma": "^7.8.0",
     "tsup": "^8.5.1",
     "tsx": "^4.22.4",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "eslint": "^9.0.0",
+    "typescript-eslint": "^8.0.0",
+    "vitest": "^3.2.0"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.8.0",
@@ -38,7 +43,8 @@
     "cors": "^2.8.6",
     "express": "^5.2.1",
     "http-status": "^2.1.0",
-    "jsonwebtoken": "^9.0.3"
+    "jsonwebtoken": "^9.0.3",
+    "zod": "^3.25.0"
   },
   "allowScripts": {
     "@prisma/engines@7.8.0": true,

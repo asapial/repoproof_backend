@@ -9,8 +9,7 @@ import { jwtUtils } from "../utils/jwt";
 import { cookieUtils } from "../utils/cookie";
 import { Role } from "../../prisma/generated/prisma/enums";
 
-declare global {
-    namespace Express {
+declare module "express-serve-static-core" {
         interface Request {
             user: {
                 userId: string;
@@ -18,7 +17,6 @@ declare global {
                 email: string;
             }
         }
-    }
 }
 
 /**
@@ -96,7 +94,7 @@ export const checkAuth = (...authRoles: Role[]) => async (req: Request, res: Res
 
         if (sessionToken) {
             const rawSessionToken = sessionToken.includes(".")
-                ? sessionToken.split(".")[0]
+                ? sessionToken.substring(0, sessionToken.indexOf("."))
                 : sessionToken;
 
             const sessionExists = await prisma.session.findFirst({

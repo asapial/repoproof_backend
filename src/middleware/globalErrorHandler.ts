@@ -3,6 +3,7 @@ import { NextFunction, Request, Response } from "express";
 import status from "http-status";
 import z from "zod";
 
+import { deleteFileFromCloudinary } from "../config/cloudinary.config";
 import { envVars } from "../config/env";
 import AppError from "../errorHelpers/AppError";
 import { handleZodError } from "../errorHelpers/handleZodError";
@@ -16,12 +17,13 @@ export const globalErrorHandler = async (err: any, req: Request, res: Response, 
         console.log("Error from Global Error Handler", err);
     }
 
-    if(req.file){
-        await deleteFileFromCloudinary(req.file.path)
+    const uploads = req as Request & { file?: { path: string }; files?: { path: string }[] };
+    if(uploads.file){
+        await deleteFileFromCloudinary(uploads.file.path)
     }
 
-    if(req.files && Array.isArray(req.files) && req.files.length > 0){
-        const imageUrls = req.files.map((file) => file.path);
+    if(uploads.files && Array.isArray(uploads.files) && uploads.files.length > 0){
+        const imageUrls = uploads.files.map((file) => file.path);
         await Promise.all(imageUrls.map(url => deleteFileFromCloudinary(url))); 
     }
 
@@ -85,7 +87,7 @@ export const globalErrorHandler = async (err: any, req: Request, res: Response, 
         message: message,
         errorSources,
         error: envVars.NODE_ENV === 'development' ? err : undefined,
-        stack: envVars.NODE_ENV === 'development' ? stack : undefined,
+        ...(envVars.NODE_ENV === 'development' && stack !== undefined ? { stack } : {}),
     }
 
     res.status(statusCode).json(errorResponse);
