@@ -19,7 +19,7 @@ Status options: `TODO`, `IN_PROGRESS`, `BLOCKED`, `DONE`, `DEFERRED`. Edit one t
 - Rechecked the frontend commit-pinned byte comparison against both backend contract files and reran the backend and frontend tests above; all passed with no skips. The checks validate proposed DTOs with sample data, not live HTTP integration.
 - The backend commit records ESLint, typecheck, isolated production build, diff checks, and staged secret review. The frontend commit records the same gates and its compatibility check. These are commit-time results; builds and lint were not rerun during this documentation reconciliation.
 - `/api/v1` business run routes are not implemented. Actual frontend-to-backend request, response, authorization, and error-envelope compatibility remains unverified until those endpoints and consumers exist. Existing backend errors differ from the proposed v1 envelope. Repository and issue lists, cancellation responses, and history lack finalized DTO shapes. Keep RPF-001C IN_PROGRESS pending integration proof; later run API work is tracked by RPF-012A/RPF-012B.
-- `RPF-SEC-001` remains a separate P0 security issue. The contract checks do not resolve or test CSRF, cookie, or CORS concerns.
+- At RPF-001C reconciliation, `RPF-SEC-001` was a separate pending P0 security issue. Contract checks did not test CSRF, cookie, or CORS concerns; see the security ticket below for its current status.
 
 ## Existing RepoProof v2 backlog (preserve original RPF ticket meaning)
 
@@ -48,7 +48,7 @@ Status options: `TODO`, `IN_PROGRESS`, `BLOCKED`, `DONE`, `DEFERRED`. Edit one t
 
 ## Pending security issue
 
-- **RPF-SEC-001 — P0 TODO: authentication and cookie security review.** Better Auth sets `disableCSRFCheck: true` and `httpOnly: false`; CORS accepts all HTTPS Vercel subdomains with credentials. Assess and test CSRF, cookie exposure, and trusted origins in a separate security ticket. These concerns were not fixed by RPF-001B.
+- **RPF-SEC-001 — P0 DONE: authentication and cookie security.** Better Auth CSRF and origin checks are enabled; cookies are HttpOnly with environment-appropriate Secure/SameSite/Path attributes; CORS uses explicit configured origins. This commit: full suite 20 passed; Prisma-backed registration, login, failed login, session, logout, CSRF, both cookie modes and CORS passed against the confirmed disposable test database; synthetic data removed. Migration status, ESLint, typecheck, isolated production build and diff checks passed. Deployed browser, OAuth and future frontend proxy integration remain unverified; see `docs/AUTH_SECURITY.md`.
 
 ## Cross-repo tracking rules
 
