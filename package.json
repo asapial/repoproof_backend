@@ -1,0 +1,49 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "test:ai": "npx tsx src/scripts/testAiResponse.ts",
+    "dev": "npx tsx watch src/server.ts",
+    "seeding": "npx tsx src/scripts/seedingAdmin.ts",
+    "migrate": "npx prisma migrate dev",
+    "generate": "npx prisma generate",
+    "postinstall": "prisma generate",
+    "build": "prisma generate && tsup src/server.ts --format esm --platform node --target node20 --outDir api --external pg-native"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "devDependencies": {
+    "@types/cookie-parser": "^1.4.10",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^26.0.1",
+    "dotenv": "^17.4.2",
+    "prisma": "^7.8.0",
+    "tsup": "^8.5.1",
+    "tsx": "^4.22.4",
+    "typescript": "^6.0.3"
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "^7.8.0",
+    "@prisma/client": "^7.8.0",
+    "better-auth": "^1.6.20",
+    "cloudinary": "^2.10.0",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "http-status": "^2.1.0",
+    "jsonwebtoken": "^9.0.3"
+  },
+  "allowScripts": {
+    "@prisma/engines@7.8.0": true,
+    "esbuild@0.28.1": true,
+    "esbuild@0.27.7": true,
+    "prisma@7.8.0": true
+  }
+}
