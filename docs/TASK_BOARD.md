@@ -11,8 +11,8 @@ Status options: `TODO`, `IN_PROGRESS`, `BLOCKED`, `DONE`, `DEFERRED`. Edit one t
 | Ticket | Repo | Status | Depends | Acceptance evidence / meaning | Code SHA / checks |
 | --- | --- | --- | --- | --- | --- |
 | RPF-001A | frontend | TODO | - | Verify or establish quality gates for EXISTING frontend: TypeScript, lint, tests and build using real scripts; preserve current app | - |
-| RPF-001B | backend | DONE | - | Existing backend quality gates verified; JWT negative tests added | This commit; npm run lint and typecheck passed; npm test -- --maxWorkers=1: 9 passed (7 in untracked RPF-001C tests, 2 committed JWT tests); isolated copy excluding RPF-001C: lint, typecheck, 2 JWT tests and build passed; git diff --check passed |
-| RPF-001C | backend | TODO | RPF-001B | Backend-owned API contract/DTO strategy, runtime validation, versioning and documented frontend compatibility checks; do not force monorepo sharing | - |
+| RPF-001B | backend | DONE | - | Existing backend quality gates verified; JWT negative tests added | 05fd51f297c69cbb1659c28c2dd64df2f00d0c81; npm run lint and typecheck passed; npm test -- --maxWorkers=1: 9 passed (7 in untracked RPF-001C tests, 2 committed JWT tests); isolated copy excluding RPF-001C: lint, typecheck, 2 JWT tests and build passed; git diff --check passed |
+| RPF-001C | backend | IN_PROGRESS | RPF-001B | Backend-owned API contract/DTO strategy, runtime validation, versioning and documented frontend compatibility checks; do not force monorepo sharing | Backend contracts: this commit; contract tests 14 passed, full suite 16 passed, lint/typecheck/build passed; frontend integration pending |
 
 ## Existing RepoProof v2 backlog (preserve original RPF ticket meaning)
 
@@ -41,7 +41,7 @@ Status options: `TODO`, `IN_PROGRESS`, `BLOCKED`, `DONE`, `DEFERRED`. Edit one t
 
 ## Pending security issue
 
-- **TODO: authentication and cookie security review.** Better Auth sets `disableCSRFCheck: true` and `httpOnly: false`; CORS accepts all HTTPS Vercel subdomains with credentials. Assess and test CSRF, cookie exposure, and trusted origins in a separate security ticket. These concerns were not fixed by RPF-001B.
+- **RPF-SEC-001 — P0 TODO: authentication and cookie security review.** Better Auth sets `disableCSRFCheck: true` and `httpOnly: false`; CORS accepts all HTTPS Vercel subdomains with credentials. Assess and test CSRF, cookie exposure, and trusted origins in a separate security ticket. These concerns were not fixed by RPF-001B.
 
 ## Cross-repo tracking rules
 

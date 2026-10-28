@@ -1,0 +1,7 @@
+# RepoProof API v1 contracts
+
+`src/contracts/v1.ts` defines proposed `/api/v1` JSON DTOs using Zod and inferred TypeScript types. These are not implemented routes and do not change existing auth, health, or error responses. Future route handlers must parse untrusted inputs, authorize ownership and fixture access, enforce idempotency, and apply deterministic verification policy. DTO validation alone does not prove evidence or assign a verdict.
+
+The create-run, run plan, approval header, event, report, and error shapes follow the MVP requirements. Event cursors are decimal query strings transformed to numbers; page events must be ordered, and a nonempty page cursor equals its last sequence. `plan` and `reportUrl` are nullable. Report data without a patch cannot include patched test evidence. Artifact access uses run and artifact IDs; report Markdown and artifact bytes are not JSON DTOs. Repository lists, issue lists, cancellation responses, and history need explicit shapes before those endpoints are implemented.
+
+The existing frontend independently mirrors domain enums. Its values currently match, but it does not consume these DTOs. Frontend integration, shared compatibility tests, and correction of its same-commit comment require a separate frontend ticket and commit. Existing backend errors use a different shape; migrating handlers to the v1 error envelope is future endpoint work and must not silently change current APIs.
