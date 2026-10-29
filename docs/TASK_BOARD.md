@@ -36,7 +36,7 @@ Status options: `TODO`, `IN_PROGRESS`, `BLOCKED`, `DONE`, `DEFERRED`. Edit one t
 | RPF-008 | backend | TODO | RPF-003, RPF-007 | Bounded source-only patch with path, test and lockfile protection | - |
 | RPF-009 | backend | TODO | RPF-008 | Independent retest of frozen reproducer and regressions with hashes | - |
 | RPF-010B | backend | TODO | RPF-010A, RPF-009 | Real artifacts drive four deterministic verdicts, never model claim | - |
-| RPF-011A | backend | TODO | RPF-001B | Persistence schema/migrations for immutable run evidence as supported by actual stack | - |
+| RPF-011A | backend | DONE | RPF-001B | Persistence schema/migrations for immutable run evidence as supported by actual stack | Disposable PostgreSQL 16: Prisma migrate deploy/status and repeat deploy passed; 24 negative constraint tests and synthetic positive cases passed. Prisma validate/generate, 66 tests, lint, typecheck, build and diff checks passed. Artifact-byte verification, authenticated provenance, verdict integration and retention remain separate work. |
 | RPF-011B | backend | TODO | RPF-011A, RPF-010B | Durable orchestrator and job lifecycle tests | - |
 | RPF-012A | backend | TODO | RPF-011B, RPF-001C | Read-only issue selection, create/approve/cancel APIs with auth and contracts | - |
 | RPF-012B | backend | TODO | RPF-012A | Authenticated events/reports/artifacts APIs with integrity checks | - |

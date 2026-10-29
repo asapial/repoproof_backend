@@ -1,0 +1,259 @@
+enum RunState {
+  CREATED
+  ANALYZING
+  AWAITING_APPROVAL
+  QUEUED
+  PREPARING
+  GENERATING_REPRO
+  BASELINING
+  PATCHING
+  VERIFYING
+  REPORTING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+enum ApprovalDecision {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum VerificationVerdict {
+  VERIFIED
+  REJECTED
+  NO_REPRO
+  INCONCLUSIVE
+}
+
+enum ReproducerOrigin {
+  MODEL_GENERATED
+  CURATED
+}
+
+enum TestPhase {
+  BASELINE_REPRO
+  BASELINE_REGRESSION
+  PATCHED_REPRO
+  PATCHED_REGRESSION
+}
+
+enum TestOutcome {
+  PASSED
+  FAILED
+  ERROR
+  TIMEOUT
+  SKIPPED
+  NO_TESTS
+}
+
+enum PatchCheckStatus {
+  PROPOSED
+  ALLOWED
+  REJECTED
+}
+
+enum ArtifactKind {
+  ISSUE_CONTEXT
+  FROZEN_TEST
+  TEST_MANIFEST
+  BASELINE_STDOUT
+  BASELINE_STDERR
+  PATCHED_STDOUT
+  PATCHED_STDERR
+  PATCH_DIFF
+  RUNNER_MANIFEST
+  REPORT_JSON
+  REPORT_MARKDOWN
+}
+
+model Repository {
+  id            String          @id @default(cuid())
+  githubRepoId  BigInt          @unique
+  owner         String
+  name          String
+  fullName      String          @unique
+  defaultBranch String
+  fixtureKey    String?         @unique
+  mvpAllowed    Boolean         @default(false)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  issues        IssueSnapshot[]
+  runs          Run[]
+
+  @@index([mvpAllowed])
+}
+
+model IssueSnapshot {
+  id          String     @id @default(cuid())
+  repositoryId String
+  repository  Repository @relation(fields: [repositoryId], references: [id], onDelete: Restrict)
+  number      Int
+  title       String
+  body        String     @db.Text
+  issueUrl    String
+  capturedAt  DateTime   @default(now())
+  runs        Run[]
+
+  @@index([repositoryId, number, capturedAt])
+}
+
+model Run {
+  id                String               @id @default(cuid())
+  userId            String?
+  user              User?                @relation(fields: [userId], references: [id], onDelete: Restrict)
+  repositoryId      String
+  repository        Repository           @relation(fields: [repositoryId], references: [id], onDelete: Restrict)
+  issueSnapshotId   String
+  issueSnapshot     IssueSnapshot        @relation(fields: [issueSnapshotId], references: [id], onDelete: Restrict)
+  baseSha           String               @db.VarChar(40)
+  fixtureKey        String
+  requestKeyHash    String?              @unique
+  state             RunState             @default(CREATED)
+  version           Int                  @default(0)
+  planJson          Json?
+  failCode          String?
+  cancelRequestedAt DateTime?
+  leaseOwner        String?
+  leaseExpiresAt    DateTime?
+  heartbeatAt       DateTime?
+  modelId           String?
+  modelCalls        Int                  @default(0)
+  inputTokens       Int                  @default(0)
+  outputTokens      Int                  @default(0)
+  createdAt         DateTime             @default(now())
+  startedAt         DateTime?
+  finishedAt        DateTime?
+  updatedAt         DateTime             @updatedAt
+  approval          RunApproval?
+  reproducer        ReproductionTest?
+  attempts          PatchAttempt[]
+  executions        TestExecution[]
+  artifacts         Artifact[]
+  events            RunEvent[]
+  report            VerificationReport?
+
+  @@index([state, leaseExpiresAt])
+  @@index([repositoryId, createdAt])
+  @@index([userId, createdAt])
+}
+
+model RunApproval {
+  id        String           @id @default(cuid())
+  runId     String           @unique
+  run       Run              @relation(fields: [runId], references: [id], onDelete: Cascade)
+  decision  ApprovalDecision @default(PENDING)
+  actorId   String?
+  idempotencyKeyHash String? @unique
+  decidedAt DateTime?
+  createdAt DateTime         @default(now())
+}
+
+model ReproductionTest {
+  id                    String           @id @default(cuid())
+  runId                 String           @unique
+  run                   Run              @relation(fields: [runId], references: [id], onDelete: Cascade)
+  origin                ReproducerOrigin
+  testId                String
+  relativePath          String
+  storageKey            String           @unique
+  sha256                String           @db.VarChar(64)
+  runnerImageDigest     String
+  commandManifestSha256 String           @db.VarChar(64)
+  validAssertion        Boolean          @default(false)
+  lockedAt              DateTime
+  createdAt             DateTime         @default(now())
+}
+
+model PatchAttempt {
+  id              String           @id @default(cuid())
+  runId           String
+  run             Run              @relation(fields: [runId], references: [id], onDelete: Cascade)
+  attemptNumber   Int
+  checkStatus     PatchCheckStatus @default(PROPOSED)
+  failureCode     String?
+  patchSha256     String?          @db.VarChar(64)
+  diffArtifactKey String?
+  changedFiles    Int              @default(0)
+  changedLines    Int              @default(0)
+  createdAt       DateTime         @default(now())
+  completedAt     DateTime?
+  executions      TestExecution[]
+
+  @@unique([runId, attemptNumber])
+  @@index([runId, createdAt])
+}
+
+model TestExecution {
+  id                    String        @id @default(cuid())
+  runId                 String
+  run                   Run           @relation(fields: [runId], references: [id], onDelete: Cascade)
+  attemptId             String?
+  attempt               PatchAttempt? @relation(fields: [attemptId], references: [id], onDelete: SetNull)
+  phase                 TestPhase
+  outcome               TestOutcome
+  testId                String?
+  testSha256            String?       @db.VarChar(64)
+  runnerImageDigest     String
+  commandManifestSha256 String        @db.VarChar(64)
+  collected             Int           @default(0)
+  executed              Int           @default(0)
+  passed                Int           @default(0)
+  failed                Int           @default(0)
+  skipped               Int           @default(0)
+  exitCode              Int?
+  failureKind           String?
+  stdoutArtifactKey     String?
+  stderrArtifactKey     String?
+  durationMs            Int
+  createdAt             DateTime      @default(now())
+
+  @@index([runId, phase, createdAt])
+  @@index([attemptId, phase])
+}
+
+model Artifact {
+  id          String       @id @default(cuid())
+  runId       String
+  run         Run          @relation(fields: [runId], references: [id], onDelete: Cascade)
+  kind        ArtifactKind
+  storageKey  String       @unique
+  sha256      String       @db.VarChar(64)
+  mediaType   String
+  byteSize    BigInt
+  createdAt   DateTime     @default(now())
+  expiresAt   DateTime?
+
+  @@index([runId, kind])
+  @@index([expiresAt])
+}
+
+model RunEvent {
+  id        BigInt   @id @default(autoincrement())
+  runId     String
+  run       Run      @relation(fields: [runId], references: [id], onDelete: Cascade)
+  seq       Int
+  stage     RunState
+  type      String
+  title     String
+  detail    Json?
+  createdAt DateTime @default(now())
+
+  @@unique([runId, seq])
+  @@index([runId, createdAt])
+}
+
+model VerificationReport {
+  id              String              @id @default(cuid())
+  runId           String              @unique
+  run             Run                 @relation(fields: [runId], references: [id], onDelete: Cascade)
+  verdict         VerificationVerdict
+  reasonCode      String
+  scopeStatement  String              @db.Text
+  policyVersion   String
+  evidenceJson    Json
+  limitationsJson Json
+  reportSha256    String              @db.VarChar(64)
+  createdAt       DateTime            @default(now())
+}

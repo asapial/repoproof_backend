@@ -54,7 +54,17 @@ export const ModelName = {
   User: 'User',
   Session: 'Session',
   Account: 'Account',
-  Verification: 'Verification'
+  Verification: 'Verification',
+  Repository: 'Repository',
+  IssueSnapshot: 'IssueSnapshot',
+  Run: 'Run',
+  RunApproval: 'RunApproval',
+  ReproductionTest: 'ReproductionTest',
+  PatchAttempt: 'PatchAttempt',
+  TestExecution: 'TestExecution',
+  Artifact: 'Artifact',
+  RunEvent: 'RunEvent',
+  VerificationReport: 'VerificationReport'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -131,12 +141,204 @@ export const VerificationScalarFieldEnum = {
 export type VerificationScalarFieldEnum = (typeof VerificationScalarFieldEnum)[keyof typeof VerificationScalarFieldEnum]
 
 
+export const RepositoryScalarFieldEnum = {
+  id: 'id',
+  githubRepoId: 'githubRepoId',
+  owner: 'owner',
+  name: 'name',
+  fullName: 'fullName',
+  defaultBranch: 'defaultBranch',
+  fixtureKey: 'fixtureKey',
+  mvpAllowed: 'mvpAllowed',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type RepositoryScalarFieldEnum = (typeof RepositoryScalarFieldEnum)[keyof typeof RepositoryScalarFieldEnum]
+
+
+export const IssueSnapshotScalarFieldEnum = {
+  id: 'id',
+  repositoryId: 'repositoryId',
+  number: 'number',
+  title: 'title',
+  body: 'body',
+  issueUrl: 'issueUrl',
+  capturedAt: 'capturedAt'
+} as const
+
+export type IssueSnapshotScalarFieldEnum = (typeof IssueSnapshotScalarFieldEnum)[keyof typeof IssueSnapshotScalarFieldEnum]
+
+
+export const RunScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  repositoryId: 'repositoryId',
+  issueSnapshotId: 'issueSnapshotId',
+  baseSha: 'baseSha',
+  fixtureKey: 'fixtureKey',
+  requestKeyHash: 'requestKeyHash',
+  state: 'state',
+  version: 'version',
+  planJson: 'planJson',
+  failCode: 'failCode',
+  cancelRequestedAt: 'cancelRequestedAt',
+  leaseOwner: 'leaseOwner',
+  leaseExpiresAt: 'leaseExpiresAt',
+  heartbeatAt: 'heartbeatAt',
+  modelId: 'modelId',
+  modelCalls: 'modelCalls',
+  inputTokens: 'inputTokens',
+  outputTokens: 'outputTokens',
+  createdAt: 'createdAt',
+  startedAt: 'startedAt',
+  finishedAt: 'finishedAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type RunScalarFieldEnum = (typeof RunScalarFieldEnum)[keyof typeof RunScalarFieldEnum]
+
+
+export const RunApprovalScalarFieldEnum = {
+  id: 'id',
+  runId: 'runId',
+  decision: 'decision',
+  actorId: 'actorId',
+  idempotencyKeyHash: 'idempotencyKeyHash',
+  decidedAt: 'decidedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type RunApprovalScalarFieldEnum = (typeof RunApprovalScalarFieldEnum)[keyof typeof RunApprovalScalarFieldEnum]
+
+
+export const ReproductionTestScalarFieldEnum = {
+  id: 'id',
+  runId: 'runId',
+  origin: 'origin',
+  testId: 'testId',
+  relativePath: 'relativePath',
+  storageKey: 'storageKey',
+  sha256: 'sha256',
+  runnerImageDigest: 'runnerImageDigest',
+  commandManifestSha256: 'commandManifestSha256',
+  validAssertion: 'validAssertion',
+  lockedAt: 'lockedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type ReproductionTestScalarFieldEnum = (typeof ReproductionTestScalarFieldEnum)[keyof typeof ReproductionTestScalarFieldEnum]
+
+
+export const PatchAttemptScalarFieldEnum = {
+  id: 'id',
+  runId: 'runId',
+  attemptNumber: 'attemptNumber',
+  checkStatus: 'checkStatus',
+  failureCode: 'failureCode',
+  patchSha256: 'patchSha256',
+  diffArtifactKey: 'diffArtifactKey',
+  changedFiles: 'changedFiles',
+  changedLines: 'changedLines',
+  createdAt: 'createdAt',
+  completedAt: 'completedAt'
+} as const
+
+export type PatchAttemptScalarFieldEnum = (typeof PatchAttemptScalarFieldEnum)[keyof typeof PatchAttemptScalarFieldEnum]
+
+
+export const TestExecutionScalarFieldEnum = {
+  id: 'id',
+  runId: 'runId',
+  attemptId: 'attemptId',
+  phase: 'phase',
+  outcome: 'outcome',
+  testId: 'testId',
+  testSha256: 'testSha256',
+  runnerImageDigest: 'runnerImageDigest',
+  commandManifestSha256: 'commandManifestSha256',
+  collected: 'collected',
+  executed: 'executed',
+  passed: 'passed',
+  failed: 'failed',
+  skipped: 'skipped',
+  exitCode: 'exitCode',
+  failureKind: 'failureKind',
+  stdoutArtifactKey: 'stdoutArtifactKey',
+  stderrArtifactKey: 'stderrArtifactKey',
+  durationMs: 'durationMs',
+  createdAt: 'createdAt'
+} as const
+
+export type TestExecutionScalarFieldEnum = (typeof TestExecutionScalarFieldEnum)[keyof typeof TestExecutionScalarFieldEnum]
+
+
+export const ArtifactScalarFieldEnum = {
+  id: 'id',
+  runId: 'runId',
+  kind: 'kind',
+  storageKey: 'storageKey',
+  sha256: 'sha256',
+  mediaType: 'mediaType',
+  byteSize: 'byteSize',
+  createdAt: 'createdAt',
+  expiresAt: 'expiresAt'
+} as const
+
+export type ArtifactScalarFieldEnum = (typeof ArtifactScalarFieldEnum)[keyof typeof ArtifactScalarFieldEnum]
+
+
+export const RunEventScalarFieldEnum = {
+  id: 'id',
+  runId: 'runId',
+  seq: 'seq',
+  stage: 'stage',
+  type: 'type',
+  title: 'title',
+  detail: 'detail',
+  createdAt: 'createdAt'
+} as const
+
+export type RunEventScalarFieldEnum = (typeof RunEventScalarFieldEnum)[keyof typeof RunEventScalarFieldEnum]
+
+
+export const VerificationReportScalarFieldEnum = {
+  id: 'id',
+  runId: 'runId',
+  verdict: 'verdict',
+  reasonCode: 'reasonCode',
+  scopeStatement: 'scopeStatement',
+  policyVersion: 'policyVersion',
+  evidenceJson: 'evidenceJson',
+  limitationsJson: 'limitationsJson',
+  reportSha256: 'reportSha256',
+  createdAt: 'createdAt'
+} as const
+
+export type VerificationReportScalarFieldEnum = (typeof VerificationReportScalarFieldEnum)[keyof typeof VerificationReportScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
 } as const
 
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
+
+
+export const NullableJsonNullValueInput = {
+  DbNull: DbNull,
+  JsonNull: JsonNull
+} as const
+
+export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
+
+
+export const JsonNullValueInput = {
+  JsonNull: JsonNull
+} as const
+
+export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
 
 
 export const QueryMode = {
@@ -153,4 +355,13 @@ export const NullsOrder = {
 } as const
 
 export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+export const JsonNullValueFilter = {
+  DbNull: DbNull,
+  JsonNull: JsonNull,
+  AnyNull: AnyNull
+} as const
+
+export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 

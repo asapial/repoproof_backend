@@ -61,3 +61,53 @@ export type Account = Prisma.AccountModel
  * 
  */
 export type Verification = Prisma.VerificationModel
+/**
+ * Model Repository
+ *
+ */
+export type Repository = Prisma.RepositoryModel
+/**
+ * Model IssueSnapshot
+ *
+ */
+export type IssueSnapshot = Prisma.IssueSnapshotModel
+/**
+ * Model Run
+ *
+ */
+export type Run = Prisma.RunModel
+/**
+ * Model RunApproval
+ *
+ */
+export type RunApproval = Prisma.RunApprovalModel
+/**
+ * Model ReproductionTest
+ *
+ */
+export type ReproductionTest = Prisma.ReproductionTestModel
+/**
+ * Model PatchAttempt
+ *
+ */
+export type PatchAttempt = Prisma.PatchAttemptModel
+/**
+ * Model TestExecution
+ *
+ */
+export type TestExecution = Prisma.TestExecutionModel
+/**
+ * Model Artifact
+ *
+ */
+export type Artifact = Prisma.ArtifactModel
+/**
+ * Model RunEvent
+ *
+ */
+export type RunEvent = Prisma.RunEventModel
+/**
+ * Model VerificationReport
+ *
+ */
+export type VerificationReport = Prisma.VerificationReportModel

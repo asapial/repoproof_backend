@@ -16,3 +16,97 @@ export const Role = {
 } as const
 
 export type Role = (typeof Role)[keyof typeof Role]
+
+
+export const RunState = {
+  CREATED: 'CREATED',
+  ANALYZING: 'ANALYZING',
+  AWAITING_APPROVAL: 'AWAITING_APPROVAL',
+  QUEUED: 'QUEUED',
+  PREPARING: 'PREPARING',
+  GENERATING_REPRO: 'GENERATING_REPRO',
+  BASELINING: 'BASELINING',
+  PATCHING: 'PATCHING',
+  VERIFYING: 'VERIFYING',
+  REPORTING: 'REPORTING',
+  COMPLETED: 'COMPLETED',
+  FAILED: 'FAILED',
+  CANCELLED: 'CANCELLED'
+} as const
+
+export type RunState = (typeof RunState)[keyof typeof RunState]
+
+
+export const ApprovalDecision = {
+  PENDING: 'PENDING',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED'
+} as const
+
+export type ApprovalDecision = (typeof ApprovalDecision)[keyof typeof ApprovalDecision]
+
+
+export const VerificationVerdict = {
+  VERIFIED: 'VERIFIED',
+  REJECTED: 'REJECTED',
+  NO_REPRO: 'NO_REPRO',
+  INCONCLUSIVE: 'INCONCLUSIVE'
+} as const
+
+export type VerificationVerdict = (typeof VerificationVerdict)[keyof typeof VerificationVerdict]
+
+
+export const ReproducerOrigin = {
+  MODEL_GENERATED: 'MODEL_GENERATED',
+  CURATED: 'CURATED'
+} as const
+
+export type ReproducerOrigin = (typeof ReproducerOrigin)[keyof typeof ReproducerOrigin]
+
+
+export const TestPhase = {
+  BASELINE_REPRO: 'BASELINE_REPRO',
+  BASELINE_REGRESSION: 'BASELINE_REGRESSION',
+  PATCHED_REPRO: 'PATCHED_REPRO',
+  PATCHED_REGRESSION: 'PATCHED_REGRESSION'
+} as const
+
+export type TestPhase = (typeof TestPhase)[keyof typeof TestPhase]
+
+
+export const TestOutcome = {
+  PASSED: 'PASSED',
+  FAILED: 'FAILED',
+  ERROR: 'ERROR',
+  TIMEOUT: 'TIMEOUT',
+  SKIPPED: 'SKIPPED',
+  NO_TESTS: 'NO_TESTS'
+} as const
+
+export type TestOutcome = (typeof TestOutcome)[keyof typeof TestOutcome]
+
+
+export const PatchCheckStatus = {
+  PROPOSED: 'PROPOSED',
+  ALLOWED: 'ALLOWED',
+  REJECTED: 'REJECTED'
+} as const
+
+export type PatchCheckStatus = (typeof PatchCheckStatus)[keyof typeof PatchCheckStatus]
+
+
+export const ArtifactKind = {
+  ISSUE_CONTEXT: 'ISSUE_CONTEXT',
+  FROZEN_TEST: 'FROZEN_TEST',
+  TEST_MANIFEST: 'TEST_MANIFEST',
+  BASELINE_STDOUT: 'BASELINE_STDOUT',
+  BASELINE_STDERR: 'BASELINE_STDERR',
+  PATCHED_STDOUT: 'PATCHED_STDOUT',
+  PATCHED_STDERR: 'PATCHED_STDERR',
+  PATCH_DIFF: 'PATCH_DIFF',
+  RUNNER_MANIFEST: 'RUNNER_MANIFEST',
+  REPORT_JSON: 'REPORT_JSON',
+  REPORT_MARKDOWN: 'REPORT_MARKDOWN'
+} as const
+
+export type ArtifactKind = (typeof ArtifactKind)[keyof typeof ArtifactKind]

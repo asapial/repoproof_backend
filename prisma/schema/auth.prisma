@@ -9,6 +9,7 @@ model User {
   updatedAt     DateTime  @updatedAt
   sessions      Session[]
   accounts      Account[]
+  runs          Run[]
 
   @@unique([email])
   @@map("user")
