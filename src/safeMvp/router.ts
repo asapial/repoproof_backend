@@ -1,28 +1,17 @@
 import { Router, type Request, type RequestHandler } from "express";
-import { z } from "zod";
 import { createRunRequestSchema } from "../contracts/v1";
+import { safeFixtureCatalogSchema } from "../contracts/safeMvp";
+export { safeFixtureCatalogSchema as publicCatalogSchema } from "../contracts/safeMvp";
 import { sendV1Error, validateV1Body } from "../middleware/v1Errors";
 
 // This is public curated metadata, not a live GitHub response or runner manifest.
-const publicFixtureSchema = z.object({
-  repositoryId: z.string().regex(/^[a-z0-9-]+$/).max(128),
-  repository: z.string().regex(/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/).max(200),
-  fixtureKey: z.string().regex(/^[a-z0-9-]+$/).max(128),
-  issueNumber: z.number().int().positive().safe(),
-  source: z.literal("CURATED"),
-}).strict();
-export const publicCatalogSchema = z.object({ repositories: z.array(publicFixtureSchema).max(100) }).strict();
 const approvedFixtures = [{ repositoryId: "repoproof-backend", repository: "asapial/repoproof_backend", fixtureKey: "discount-bug", issueNumber: 1, source: "CURATED" }] as const;
 
 export function createSafeMvpRouter(
   hasSession: (request: Request) => Promise<boolean>,
   configuredFixtures: unknown = approvedFixtures,
 ): Router {
-  const catalog = publicCatalogSchema.parse({ repositories: configuredFixtures });
-  const keys = new Set(catalog.repositories.map(item => `${item.repositoryId}:${item.fixtureKey}`));
-  if (keys.size !== catalog.repositories.length || new Set(catalog.repositories.map(item => item.repositoryId)).size !== catalog.repositories.length) {
-    throw new Error("Duplicate fixture catalog entries");
-  }
+  const catalog = safeFixtureCatalogSchema.parse({ repositories: configuredFixtures });
   const router = Router();
   const authenticate: RequestHandler = async (req, res, next) => {
     res.set("Cache-Control", "no-store");

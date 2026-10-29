@@ -7,7 +7,9 @@ Updated: 2026-10-30. This ledger records local evidence and blockers, not deploy
 - RPF-001A: frontend quality verification; tracking commit `98334aa288a77f43aa4686a2d9cae3301aa28d5d`. Six tests, lint, typecheck and build passed. Next.js ESLint plugin warning remains; live integration was not verified.
 - RPF-011A: PostgreSQL run and evidence persistence; commit `a5ba17a492e76d411601bfe0f729db09960701b4`. Disposable PostgreSQL migration deploy/status and repeat deploy, 24 negative SQL cases, 66 tests, lint, typecheck and build passed. Artifact byte integrity, runner provenance, retention and verdict integration remain separate.
 - Dependency reconciliation: commit `1b50f1ddf49715848a85077a1aaa9812bcb98449`; the 26-ticket graph was checked for unresolved dependencies and cycles. RPF-001C contract snapshots are complete, but live integration is not.
-- RPF-012S: authenticated curated fixture catalog and fail-closed run requests are in this commit. No run, job or verdict is produced while the runner is unavailable. PostgreSQL-backed session integration uses a disposable database; HTTP behavior includes 503 RUNNER_UNAVAILABLE and unchanged run/evidence counts. Application tests, lint, typecheck, build and security checks are recorded in the task board.
+- RPF-012S: authenticated curated fixture catalog and fail-closed run requests are in commit `446065d4d9773d1b5656c1c441a786b0b042e4df`. No run, job or verdict is produced while the runner is unavailable. PostgreSQL-backed session integration uses a disposable database; HTTP behavior includes 503 RUNNER_UNAVAILABLE and unchanged run/evidence counts. Application tests, lint, typecheck, build and security checks are recorded in the task board.
+
+- RPF-012T: backend-owned strict catalog response schema is in this commit. 73 tests, lint, typecheck, isolated build and disposable PostgreSQL-backed HTTP regression passed.
 
 ## Active work and blockers
 
@@ -18,7 +20,7 @@ Updated: 2026-10-30. This ledger records local evidence and blockers, not deploy
 
 ## Next actions
 
-Reconcile the tested RPF-001C frontend changes and the now-committed v1 error envelope without overwriting either worktree. Identify an independently testable, dependency-ready safe persistence/integration scope without enabling runner execution or weakening RPF-012A/010B prerequisites. Update this ledger as tickets are completed, recording their actual commit SHAs and checks.
+Implement RPF-013S using the committed backend catalog contract and real authenticated API; preserve and selectively reuse the tested RPF-001C frontend changes without overwriting that worktree. Identify a separately scoped safe persistence path without enabling runner execution or weakening RPF-012A/010B prerequisites. Update this ledger as tickets are completed, recording their actual commit SHAs and checks.
 
 ## Approved workflow exception
 
