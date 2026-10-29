@@ -1,10 +1,12 @@
 import express, { type RequestHandler, type Router } from "express";
 import cookieParser from "cookie-parser";
 import { securityConfig } from "./config/security";
+import { assignV1RequestId, sendV1Error, v1ErrorHandler } from "./middleware/v1Errors";
 
 export function createApp(authHandler: RequestHandler, router: Router, frontendUrl: string, production: boolean, backendUrl?: string) {
   const app = express();
   const security = securityConfig(frontendUrl, production, backendUrl);
+  app.use("/api/v1", assignV1RequestId);
   app.use(security.originGuard);
   app.use(security.cors);
   // Better Auth must receive the unconsumed request body.
@@ -25,5 +27,7 @@ export function createApp(authHandler: RequestHandler, router: Router, frontendU
     });
   });
   app.use("/api/v1", router);
+  app.use("/api/v1", (_req, res) => sendV1Error(res, 404, "NOT_FOUND", "Resource not found"));
+  app.use(v1ErrorHandler);
   return app;
 }

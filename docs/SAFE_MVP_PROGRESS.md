@@ -1,0 +1,25 @@
+# SAFE MVP progress ledger
+
+Updated: 2026-10-30. This ledger records local evidence and blockers, not deployment or runner verification.
+
+## Completed and included in this history
+
+- RPF-001A: frontend quality verification; tracking commit `98334aa288a77f43aa4686a2d9cae3301aa28d5d`. Six tests, lint, typecheck and build passed. Next.js ESLint plugin warning remains; live integration was not verified.
+- RPF-011A: PostgreSQL run and evidence persistence; commit `a5ba17a492e76d411601bfe0f729db09960701b4`. Disposable PostgreSQL migration deploy/status and repeat deploy, 24 negative SQL cases, 66 tests, lint, typecheck and build passed. Artifact byte integrity, runner provenance, retention and verdict integration remain separate.
+- Dependency reconciliation: commit `1b50f1ddf49715848a85077a1aaa9812bcb98449`; the 26-ticket graph was checked for unresolved dependencies and cycles. RPF-001C contract snapshots are complete, but live integration is not.
+- RPF-012S: authenticated curated fixture catalog and fail-closed run requests are in this commit. No run, job or verdict is produced while the runner is unavailable. PostgreSQL-backed session integration uses a disposable database; HTTP behavior includes 503 RUNNER_UNAVAILABLE and unchanged run/evidence counts. Application tests, lint, typecheck, build and security checks are recorded in the task board.
+
+## Active work and blockers
+
+- RPF-001C remains IN_PROGRESS: live frontend/backend request, authorization, error-envelope and report integration are unverified. Existing tested but uncommitted work remains in `rpf001c-backend-worktree` and `rpf001c-frontend-worktree`; RPF-012S reused its backend error-envelope helper without modifying those worktrees. The frontend parser remains unintegrated.
+- RPF-004 remains IN_PROGRESS in its original dirty worktree. Its runner has no independent isolation or real execution evidence. RPF-006A remains DEFERRED by user instruction. RPF-010B, RPF-011B and RPF-012A remain blocked by their recorded dependencies.
+- The integrated MVP still needs safe persisted user workflows, real frontend consumption, authorized report/evidence retrieval, end-to-end testing and staging verification. RPF-012S does not create or persist a run.
+- No staging provider, credentials, spending or infrastructure has been authorized. Do not claim deployment or production readiness.
+
+## Next actions
+
+Reconcile the tested RPF-001C frontend changes and the now-committed v1 error envelope without overwriting either worktree. Identify an independently testable, dependency-ready safe persistence/integration scope without enabling runner execution or weakening RPF-012A/010B prerequisites. Update this ledger as tickets are completed, recording their actual commit SHAs and checks.
+
+## Approved workflow exception
+
+For this SAFE MVP milestone the user approved sequential local dependency-ready tickets. Keep one reviewed local commit per completed ticket, all tests and security gates, preserved worktrees and no push/deploy/spending/infrastructure without separate authorization. Do not bypass dependencies, untrusted-code isolation, frozen tests or deterministic verdict policy.

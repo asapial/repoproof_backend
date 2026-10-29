@@ -1,5 +1,6 @@
 import type { NextFunction, Request, Response } from "express";
 import cors from "cors";
+import { sendV1Error } from "../middleware/v1Errors";
 
 export function securityConfig(frontendUrl: string, production: boolean, backendUrl?: string) {
   let url: URL;
@@ -14,12 +15,15 @@ export function securityConfig(frontendUrl: string, production: boolean, backend
   const allowedOrigins = new Set([allowedOrigin, ...(backendOrigin ? [backendOrigin] : [])]);
   const originGuard = (req: Request, res: Response, next: NextFunction) => {
     const origin = req.get("origin");
-    if (origin && !allowedOrigins.has(origin)) return res.status(403).json({ message: "Origin not allowed" });
+    if (origin && !allowedOrigins.has(origin)) {
+      if (/^\/api\/v1(?:\/|$)/i.test(req.path)) return sendV1Error(res, 403, "ORIGIN_NOT_ALLOWED", "Origin not allowed");
+      return res.status(403).json({ message: "Origin not allowed" });
+    }
     next();
   };
   const csrfGuard = (req: Request, res: Response, next: NextFunction) => {
     if (!["GET", "HEAD", "OPTIONS"].includes(req.method) && req.headers.cookie && !allowedOrigins.has(req.get("origin") ?? "")) {
-      return res.status(403).json({ message: "Origin required for cookie-authenticated requests" });
+      return sendV1Error(res, 403, "ORIGIN_REQUIRED", "Origin required for cookie-authenticated requests");
     }
     next();
   };
