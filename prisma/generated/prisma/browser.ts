@@ -87,3 +87,8 @@ export type RunEvent = Prisma.RunEventModel
  *
  */
 export type VerificationReport = Prisma.VerificationReportModel
+/**
+ * Model RequestDraft
+ *
+ */
+export type RequestDraft = Prisma.RequestDraftModel

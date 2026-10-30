@@ -64,7 +64,8 @@ export const ModelName = {
   TestExecution: 'TestExecution',
   Artifact: 'Artifact',
   RunEvent: 'RunEvent',
-  VerificationReport: 'VerificationReport'
+  VerificationReport: 'VerificationReport',
+  RequestDraft: 'RequestDraft'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -316,6 +317,16 @@ export const VerificationReportScalarFieldEnum = {
 } as const
 
 export type VerificationReportScalarFieldEnum = (typeof VerificationReportScalarFieldEnum)[keyof typeof VerificationReportScalarFieldEnum]
+
+
+export const RequestDraftScalarFieldEnum = {
+  userId: 'userId',
+  repositoryId: 'repositoryId',
+  fixtureKey: 'fixtureKey',
+  issueNumber: 'issueNumber'
+} as const
+
+export type RequestDraftScalarFieldEnum = (typeof RequestDraftScalarFieldEnum)[keyof typeof RequestDraftScalarFieldEnum]
 
 
 export const SortOrder = {

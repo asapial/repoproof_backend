@@ -410,7 +410,8 @@ export const ModelName = {
   TestExecution: 'TestExecution',
   Artifact: 'Artifact',
   RunEvent: 'RunEvent',
-  VerificationReport: 'VerificationReport'
+  VerificationReport: 'VerificationReport',
+  RequestDraft: 'RequestDraft'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -426,7 +427,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "session" | "account" | "verification" | "repository" | "issueSnapshot" | "run" | "runApproval" | "reproductionTest" | "patchAttempt" | "testExecution" | "artifact" | "runEvent" | "verificationReport"
+    modelProps: "user" | "session" | "account" | "verification" | "repository" | "issueSnapshot" | "run" | "runApproval" | "reproductionTest" | "patchAttempt" | "testExecution" | "artifact" | "runEvent" | "verificationReport" | "requestDraft"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1466,6 +1467,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    RequestDraft: {
+      payload: Prisma.$RequestDraftPayload<ExtArgs>
+      fields: Prisma.RequestDraftFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.RequestDraftFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RequestDraftPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.RequestDraftFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RequestDraftPayload>
+        }
+        findFirst: {
+          args: Prisma.RequestDraftFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RequestDraftPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.RequestDraftFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RequestDraftPayload>
+        }
+        findMany: {
+          args: Prisma.RequestDraftFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RequestDraftPayload>[]
+        }
+        create: {
+          args: Prisma.RequestDraftCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RequestDraftPayload>
+        }
+        createMany: {
+          args: Prisma.RequestDraftCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.RequestDraftCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RequestDraftPayload>[]
+        }
+        delete: {
+          args: Prisma.RequestDraftDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RequestDraftPayload>
+        }
+        update: {
+          args: Prisma.RequestDraftUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RequestDraftPayload>
+        }
+        deleteMany: {
+          args: Prisma.RequestDraftDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.RequestDraftUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.RequestDraftUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RequestDraftPayload>[]
+        }
+        upsert: {
+          args: Prisma.RequestDraftUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RequestDraftPayload>
+        }
+        aggregate: {
+          args: Prisma.RequestDraftAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateRequestDraft>
+        }
+        groupBy: {
+          args: Prisma.RequestDraftGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RequestDraftGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.RequestDraftCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RequestDraftCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1738,6 +1813,16 @@ export const VerificationReportScalarFieldEnum = {
 } as const
 
 export type VerificationReportScalarFieldEnum = (typeof VerificationReportScalarFieldEnum)[keyof typeof VerificationReportScalarFieldEnum]
+
+
+export const RequestDraftScalarFieldEnum = {
+  userId: 'userId',
+  repositoryId: 'repositoryId',
+  fixtureKey: 'fixtureKey',
+  issueNumber: 'issueNumber'
+} as const
+
+export type RequestDraftScalarFieldEnum = (typeof RequestDraftScalarFieldEnum)[keyof typeof RequestDraftScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -2161,6 +2246,7 @@ export type GlobalOmitConfig = {
   artifact?: Prisma.ArtifactOmit
   runEvent?: Prisma.RunEventOmit
   verificationReport?: Prisma.VerificationReportOmit
+  requestDraft?: Prisma.RequestDraftOmit
 }
 
 /* Types for Logging */

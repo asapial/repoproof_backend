@@ -21,17 +21,21 @@ Updated: 2026-10-30. This ledger records local evidence and blockers, not deploy
 
 - RPF-SEC-004BE: this commit pins the tsup esbuild dependency to 0.28.1 to address its low-severity Windows development-server advisory. 75 tests, lint, typecheck, isolated production build and clean npm ci passed; backend audit reports zero findings.
 
+- RPF-SEC-004BE: commit `62eb06db26f7569905470eecc27484b0147b0293` addresses the remaining backend esbuild audit finding.
+- Integration baseline: backend 75 tests and frontend 14 tests, lint, typechecks, builds and audits passed in separate verified-code worktrees; PostgreSQL migrations and real browser/API integration passed, with zero run/evidence rows. Existing dirty runner and RPF-001C worktrees were preserved.
+- RPF-012D: this commit adds one per-user saved curated request draft, without execution or run/evidence records. 78 tests, lint, typecheck, build, audit, disposable PostgreSQL migration and two-user negative/security integration passed.
+
 ## Active work and blockers
 
 - RPF-001C remains IN_PROGRESS: full run and report request, authorization and error-envelope integration remains unverified. Existing tested but uncommitted work remains in `rpf001c-backend-worktree` and `rpf001c-frontend-worktree`; RPF-012S reused its backend error-envelope helper without modifying those worktrees. The frontend parser is included in RPF-013S; its earlier uncommitted source remains preserved.
 - RPF-004 remains IN_PROGRESS in its original dirty worktree. Its runner has no independent isolation or real execution evidence. RPF-006A remains DEFERRED by user instruction. RPF-010B, RPF-011B and RPF-012A remain blocked by their recorded dependencies.
 - Earlier RPF-013S work remains uncommitted in `rpf013s-worktree` and was preserved while its implementation was reconciled into the separate frontend commit. Both current frontend and backend audits report zero findings.
-- The integrated MVP still needs safe persisted run workflows, authorized report/evidence retrieval and staging verification. RPF-012S does not create or persist a run.
+- RPF-013D still needs real frontend draft integration. The integrated MVP still needs actual run workflows, authorized report/evidence retrieval and staging verification. RPF-012S does not create or persist a run.
 - No staging provider, credentials, spending or infrastructure has been authorized. Do not claim deployment or production readiness.
 
 ## Next actions
 
-Assess the remaining RPF-001C integration gap without overwriting its original worktrees. Identify a separately scoped safe persistence path without enabling runner execution or weakening RPF-012A/010B prerequisites. Update this ledger as tickets are completed, recording their actual commit SHAs and checks.
+Implement RPF-013D against RPF-012D without overwriting existing frontend worktrees. Preserve the RPF-001C live-integration gap and runner-dependent prerequisites. Update this ledger as tickets are completed, recording their actual commit SHAs and checks.
 
 ## Approved workflow exception
 

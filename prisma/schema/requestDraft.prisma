@@ -1,0 +1,8 @@
+// A saved selection only; it is not a run, queue item, approval or evidence.
+model RequestDraft {
+  userId       String @id
+  user         User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  repositoryId String @db.VarChar(128)
+  fixtureKey   String @db.VarChar(128)
+  issueNumber  Int
+}

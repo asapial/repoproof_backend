@@ -10,6 +10,7 @@ model User {
   sessions      Session[]
   accounts      Account[]
   runs          Run[]
+  requestDraft  RequestDraft?
 
   @@unique([email])
   @@map("user")

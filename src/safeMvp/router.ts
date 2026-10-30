@@ -5,7 +5,7 @@ export { safeFixtureCatalogSchema as publicCatalogSchema } from "../contracts/sa
 import { sendV1Error, validateV1Body } from "../middleware/v1Errors";
 
 // This is public curated metadata, not a live GitHub response or runner manifest.
-const approvedFixtures = [{ repositoryId: "repoproof-backend", repository: "asapial/repoproof_backend", fixtureKey: "discount-bug", issueNumber: 1, source: "CURATED" }] as const;
+export const approvedFixtures = [{ repositoryId: "repoproof-backend", repository: "asapial/repoproof_backend", fixtureKey: "discount-bug", issueNumber: 1, source: "CURATED" }] as const;
 
 export function createSafeMvpRouter(
   hasSession: (request: Request) => Promise<boolean>,
