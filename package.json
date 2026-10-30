@@ -52,5 +52,10 @@
     "esbuild@0.28.1": true,
     "esbuild@0.27.7": true,
     "prisma@7.10.1": true
+  },
+  "overrides": {
+    "tsup": {
+      "esbuild": "0.28.1"
+    }
   }
 }
