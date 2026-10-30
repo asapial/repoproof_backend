@@ -27,13 +27,15 @@ Updated: 2026-10-30. This ledger records local evidence and blockers, not deploy
 
 - RPF-013D: frontend commit `9e490e5e8f23d7631317590b6c41bb2ba6f947a3` saves, restores and deletes user-owned drafts. 16 tests, lint, typecheck, production build, contract parity, audit and real disposable PostgreSQL-backed browser integration passed. No run or evidence was created.
 
+- RPF-STG-001: this commit fixes production bundle startup by treating dotenv as a runtime dependency and prepares `docs/STAGING_SAFE_MVP.md`. The previous bundle failed with `Dynamic require of fs is not supported`; the new bundle passed production-mode loopback smoke with production-only dependencies, secure cookies, authentication, origin denial and runner-unavailable 503. 78 tests, lint, typecheck, build and audit passed. Real staging and HTTPS behavior remain unverified.
+
 ## Active work and blockers
 
 - RPF-001C remains IN_PROGRESS: full run and report request, authorization and error-envelope integration remains unverified. Existing tested but uncommitted work remains in `rpf001c-backend-worktree` and `rpf001c-frontend-worktree`; RPF-012S reused its backend error-envelope helper without modifying those worktrees. The frontend parser is included in RPF-013S; its earlier uncommitted source remains preserved.
 - RPF-004 remains IN_PROGRESS in its original dirty worktree. Its runner has no independent isolation or real execution evidence. RPF-006A remains DEFERRED by user instruction. RPF-010B, RPF-011B and RPF-012A remain blocked by their recorded dependencies.
 - Earlier RPF-013S work remains uncommitted in `rpf013s-worktree` and was preserved while its implementation was reconciled into the separate frontend commit. Both current frontend and backend audits report zero findings.
 - The integrated MVP still needs actual run workflows, authorized report/evidence retrieval and staging verification. Drafts are saved selections and provide no execution or verdict. RPF-012S does not create or persist a run.
-- No staging provider, credentials, spending or infrastructure has been authorized. Do not claim deployment or production readiness.
+- No staging provider, credentials, spending or infrastructure has been authorized. The current environment loader requires credentials for integrations unused by SAFE MVP; see `docs/STAGING_SAFE_MVP.md`. Do not claim deployment or production readiness.
 
 ## Next actions
 
