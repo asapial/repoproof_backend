@@ -29,14 +29,14 @@ export const runResponseSchema = z.object({
     ctx.addIssue({ code: z.ZodIssueCode.custom, message: "A report URL requires a completed run" });
   }
 });
-export const approvalHeadersSchema = z.object({ "idempotency-key": z.string().uuid() }).passthrough();
+export const approvalHeadersSchema = z.object({ "idempotency-key": z.guid() }).passthrough();
 export const runIdParamsSchema = z.object({ id }).strict();
 export const artifactParamsSchema = z.object({ id, artifactId: id }).strict();
 export const eventsQuerySchema = z.object({ afterSeq: z.string().regex(/^(0|[1-9][0-9]*)$/).transform(Number).pipe(count).optional() }).strict();
-const jsonValueSchema: z.ZodType<unknown> = z.lazy(() => z.union([z.string(), z.number().finite(), z.boolean(), z.null(), z.array(jsonValueSchema), z.record(jsonValueSchema)]));
+const jsonValueSchema: z.ZodType<unknown> = z.lazy(() => z.union([z.string(), z.number().finite(), z.boolean(), z.null(), z.array(jsonValueSchema), z.record(z.string(), jsonValueSchema)]));
 export const runEventSchema = z.object({
   seq: positiveInt, stage: runStateSchema, type: text, title: text,
-  detail: z.record(jsonValueSchema), at: z.string().datetime({ offset: true }),
+  detail: z.record(z.string(), jsonValueSchema), at: z.string().datetime({ offset: true }),
 }).strict();
 export const eventsResponseSchema = z.object({
   runId: id, events: z.array(runEventSchema), nextCursor: count.nullable(), terminal: z.boolean(),

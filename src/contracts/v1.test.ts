@@ -28,6 +28,7 @@ describe("v1 request and response contracts", () => {
     expect(runResponseSchema.safeParse({ ...run, approval: "APPROVED" }).success).toBe(false);
     expect(runResponseSchema.safeParse({ ...run, reportUrl: "/api/v1/runs/run_1/report" }).success).toBe(false);
     expect(approvalHeadersSchema.safeParse({ "idempotency-key": "not-uuid" }).success).toBe(false);
+    expect(approvalHeadersSchema.safeParse({ "idempotency-key": "11111111-1111-1111-1111-111111111111" }).success).toBe(true);
     expect(approvalHeadersSchema.safeParse({ "idempotency-key": "d65f1715-6634-4507-9039-a09cc983cb81" }).success).toBe(true);
   });
   it("checks cursor syntax, event order and matching next cursor", () => {
@@ -35,6 +36,8 @@ describe("v1 request and response contracts", () => {
     for (const afterSeq of ["-1", "1.5", "01", "9007199254740992"]) expect(eventsQuerySchema.safeParse({ afterSeq }).success).toBe(false);
     const page = { runId: "run_1", events: [event], nextCursor: 6, terminal: false };
     expect(eventsResponseSchema.safeParse(page).success).toBe(true);
+    expect(eventsResponseSchema.safeParse({ ...page, events: [{ ...event, detail: { nested: [{ ok: true, value: null }] } }] }).success).toBe(true);
+    expect(eventsResponseSchema.safeParse({ ...page, events: [{ ...event, detail: { invalid: Infinity } }] }).success).toBe(false);
     expect(eventsResponseSchema.safeParse({ ...page, nextCursor: 5 }).success).toBe(false);
     expect(eventsResponseSchema.safeParse({ ...page, events: [event, event] }).success).toBe(false);
     expect(eventsResponseSchema.safeParse({ ...page, events: [{ ...event, seq: 0 }] }).success).toBe(false);
