@@ -15,10 +15,14 @@ try {
   const identity = await prisma.$queryRaw<Array<{ name: string }>>`SELECT current_database() AS name`;
   assert.equal(identity[0]?.name, "rpf012s_disposable");
   const base = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
-  const signup = await fetch(`${base}/api/auth/sign-up/email`, { method: "POST", headers: { origin, "content-type": "application/json" }, body: JSON.stringify({ name: "Synthetic", email: `safe-${randomUUID()}@example.test`, password: "synthetic-only-password-123" }) });
+  const email = `safe-${randomUUID()}@example.test`;
+  const password = "synthetic-only-password-123";
+  const signup = await fetch(`${base}/api/auth/sign-up/email`, { method: "POST", headers: { origin, "content-type": "application/json" }, body: JSON.stringify({ name: "Synthetic", email, password }) });
   assert.equal(signup.status, 200);
-  const cookie = signup.headers.getSetCookie().find(c => c.startsWith("better-auth.session_token="))?.split(";")[0];
-  assert.ok(cookie);
+  const sessionHeader = signup.headers.getSetCookie().find(c => c.startsWith("better-auth.session_token="));
+  assert.ok(sessionHeader);
+  assert.match(sessionHeader, /HttpOnly/i); assert.match(sessionHeader, /SameSite=Lax/i);
+  const cookie = sessionHeader.split(";")[0]!;
   const catalog = await fetch(`${base}/api/v1/repositories`, { headers: { origin, cookie } });
   assert.equal(catalog.status, 200);
   const items = await catalog.json() as { repositories: Array<{ repositoryId: string; fixtureKey: string; issueNumber: number; source: string }> };
@@ -35,7 +39,15 @@ try {
   assert.equal(noSession.status, 401);
   const blocked = await fetch(`${base}/api/v1/runs`, { method: "POST", headers: { origin: "https://evil.example", cookie, "content-type": "application/json" }, body });
   assert.equal(blocked.status, 403);
-  console.log("PASS: real HTTP and PostgreSQL-backed session; curated catalog; 503; unchanged run/evidence counts; auth and origin rejections");
+  const badLogin = await fetch(`${base}/api/auth/sign-in/email`, { method: "POST", headers: { origin, "content-type": "application/json" }, body: JSON.stringify({ email, password: "wrong-synthetic-password" }) });
+  assert.equal(badLogin.status, 401);
+  const csrf = await fetch(`${base}/api/auth/sign-out`, { method: "POST", headers: { cookie, "content-type": "application/json" }, body: "{}" });
+  assert.equal(csrf.status, 403);
+  const logout = await fetch(`${base}/api/auth/sign-out`, { method: "POST", headers: { origin, cookie, "content-type": "application/json" }, body: "{}" });
+  assert.equal(logout.status, 200);
+  const afterLogout = await fetch(`${base}/api/auth/get-session`, { headers: { origin, cookie } });
+  assert.equal(await afterLogout.json(), null);
+  console.log("PASS: PostgreSQL-backed signup, cookie flags, session, invalid login, CSRF, logout; curated catalog, 503 and unchanged run/evidence counts");
 } finally {
   await new Promise<void>((resolve, reject) => server.close(error => error ? reject(error) : resolve()));
   await prisma.$disconnect();

@@ -9,18 +9,21 @@ Updated: 2026-10-30. This ledger records local evidence and blockers, not deploy
 - Dependency reconciliation: commit `1b50f1ddf49715848a85077a1aaa9812bcb98449`; the 26-ticket graph was checked for unresolved dependencies and cycles. RPF-001C contract snapshots are complete, but live integration is not.
 - RPF-012S: authenticated curated fixture catalog and fail-closed run requests are in commit `446065d4d9773d1b5656c1c441a786b0b042e4df`. No run, job or verdict is produced while the runner is unavailable. PostgreSQL-backed session integration uses a disposable database; HTTP behavior includes 503 RUNNER_UNAVAILABLE and unchanged run/evidence counts. Application tests, lint, typecheck, build and security checks are recorded in the task board.
 
-- RPF-012T: backend-owned strict catalog response schema is in this commit. 73 tests, lint, typecheck, isolated build and disposable PostgreSQL-backed HTTP regression passed.
+- RPF-012T: backend-owned strict catalog response schema is in commit `7ee2c691165ba21708562788841e721f73dc6a12`. 73 tests, lint, typecheck, isolated build and disposable PostgreSQL-backed HTTP regression passed.
+
+- RPF-SEC-002BE: this commit updates Better Auth, Express/body-parser, proxy-addr and the Vitest/Vite toolchain. 75 tests, lint, typecheck, isolated build, PostgreSQL-backed auth/API tests and old-session compatibility passed. Critical backend audit findings dropped from 4 to 0; 6 high findings remain.
 
 ## Active work and blockers
 
 - RPF-001C remains IN_PROGRESS: live frontend/backend request, authorization, error-envelope and report integration are unverified. Existing tested but uncommitted work remains in `rpf001c-backend-worktree` and `rpf001c-frontend-worktree`; RPF-012S reused its backend error-envelope helper without modifying those worktrees. The frontend parser remains unintegrated.
 - RPF-004 remains IN_PROGRESS in its original dirty worktree. Its runner has no independent isolation or real execution evidence. RPF-006A remains DEFERRED by user instruction. RPF-010B, RPF-011B and RPF-012A remain blocked by their recorded dependencies.
-- The integrated MVP still needs safe persisted user workflows, real frontend consumption, authorized report/evidence retrieval, end-to-end testing and staging verification. RPF-012S does not create or persist a run.
+- RPF-013S has uncommitted UI code in `rpf013s-worktree`: 14 unit tests, production build and real browser signup/session/catalog/503/logout integration passed with a disposable PostgreSQL database; no run/evidence rows were created. The branch is not yet committed. Existing frontend audit reports 2 critical and 2 high findings; backend still has 6 high findings after RPF-SEC-002BE. Remediation is required before declaring security readiness.
+- The integrated MVP still needs safe persisted run workflows, authorized report/evidence retrieval and staging verification. RPF-012S does not create or persist a run.
 - No staging provider, credentials, spending or infrastructure has been authorized. Do not claim deployment or production readiness.
 
 ## Next actions
 
-Implement RPF-013S using the committed backend catalog contract and real authenticated API; preserve and selectively reuse the tested RPF-001C frontend changes without overwriting that worktree. Identify a separately scoped safe persistence path without enabling runner execution or weakening RPF-012A/010B prerequisites. Update this ledger as tickets are completed, recording their actual commit SHAs and checks.
+Complete RPF-SEC-003BE and RPF-SEC-002FE security remediation, then reconcile the tested RPF-013S and RPF-001C frontend changes without overwriting their worktrees. Identify a separately scoped safe persistence path without enabling runner execution or weakening RPF-012A/010B prerequisites. Update this ledger as tickets are completed, recording their actual commit SHAs and checks.
 
 ## Approved workflow exception
 

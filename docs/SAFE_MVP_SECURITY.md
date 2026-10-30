@@ -1,0 +1,9 @@
+# SAFE MVP dependency security backlog
+
+As of 2026-10-30, npm audit on the original frontend lockfile reported 6 advisories: 2 moderate, 2 high and 2 critical. The original backend lockfile reported 20: 3 low, 6 moderate, 7 high and 4 critical. These are registry findings, not proof that every vulnerable feature is reachable in RepoProof. Do not deploy publicly or call the application production-ready while they are unresolved.
+
+RPF-SEC-002BE updates Better Auth, Express/body-parser, proxy-addr and the Vitest/Vite backend toolchain. This reduced the backend audit to 11: 1 low, 4 moderate and 6 high; no critical findings remain in that audit. Real PostgreSQL-backed signup/session/CSRF/logout, old-session compatibility, API and browser regression tests were run with synthetic accounts and disposable resources. The proxy-addr regression was observed to fail on the old version and pass on the updated version. No security checks were disabled.
+
+RPF-SEC-003BE must investigate and remediate the remaining backend high findings, including Zod and the Prisma dependency tree. It must preserve strict schemas, deterministic verdict policy, data migration behavior and existing APIs. Validate compatibility, disposable PostgreSQL integration, tests, lint, typecheck, build and an updated audit. Do not use force or suppress findings. Any remaining advisory needs an explicit, evidence-based disposition and remains a deployment blocker until resolved.
+
+RPF-SEC-002FE must independently remediate frontend high/critical Next/PostCSS, Zod and Vitest findings after the backend contract migration. Preserve backend-owned contract parity, authentication behavior, and the RPF-013S browser flow. Use a separate frontend code commit and backend tracking commit. Verify real HTTP integration using disposable resources and record any remaining audit findings honestly. Existing RPF-013S work is uncommitted and must not be discarded or blindly overwritten.

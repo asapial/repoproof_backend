@@ -1,0 +1,53 @@
+import { strict as assert } from "node:assert";
+import { readFileSync } from "node:fs";
+import { pathToFileURL } from "node:url";
+import { join, resolve } from "node:path";
+import type { AddressInfo } from "node:net";
+import { randomUUID } from "node:crypto";
+import express from "express";
+import { betterAuth } from "better-auth";
+import { prismaAdapter } from "better-auth/adapters/prisma";
+import { toNodeHandler } from "better-auth/node";
+import { authSecurityOptions } from "../src/lib/authSecurity";
+
+const database = new URL(process.env.DATABASE_URL ?? "");
+if (database.hostname !== "127.0.0.1" || database.port !== "35440" || database.pathname !== "/rpf012s_disposable") throw new Error("Refusing non-disposable database target");
+const oldRoot = process.env.RPF_OLD_AUTH_ROOT;
+if (!oldRoot) throw new Error("RPF_OLD_AUTH_ROOT must name the previous installation");
+const packageRoot = resolve(oldRoot, "better-auth");
+const version = JSON.parse(readFileSync(join(packageRoot, "package.json"), "utf8")) as { version: string };
+if (version.version !== "1.6.20") throw new Error("Unexpected previous Better Auth version");
+const oldMain = await import(pathToFileURL(join(packageRoot, "dist/index.mjs")).href) as typeof import("better-auth");
+const oldPrisma = await import(pathToFileURL(join(packageRoot, "dist/adapters/prisma-adapter/index.mjs")).href) as typeof import("better-auth/adapters/prisma");
+const oldNode = await import(pathToFileURL(join(packageRoot, "dist/integrations/node.mjs")).href) as typeof import("better-auth/node");
+const { prisma } = await import("../src/lib/prisma");
+const origin = "http://localhost:3000";
+const common = { ...authSecurityOptions(origin, false), baseURL: "http://localhost:3001", secret: "synthetic-upgrade-test-secret-not-for-production" };
+const older = oldMain.betterAuth({ ...common, database: oldPrisma.prismaAdapter(prisma, { provider: "postgresql" }) });
+const newer = betterAuth({ ...common, database: prismaAdapter(prisma, { provider: "postgresql" }) });
+const oldApp = express(); oldApp.all("/api/auth/*splat", oldNode.toNodeHandler(older));
+const newApp = express(); newApp.all("/api/auth/*splat", toNodeHandler(newer));
+const oldServer = oldApp.listen(0,"127.0.0.1"); const newServer = newApp.listen(0,"127.0.0.1");
+await Promise.all([oldServer,newServer].map(server => new Promise<void>((resolve,reject) => { if (server.listening) return resolve(); server.once("listening",resolve); server.once("error",reject); })));
+try {
+  const identity = await prisma.$queryRaw<Array<{ name: string }>>`SELECT current_database() AS name`;
+  assert.equal(identity[0]?.name, "rpf012s_disposable");
+  const base = (server: typeof oldServer) => `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
+  const email = `upgrade-${randomUUID()}@example.test`;
+  const signup = await fetch(`${base(oldServer)}/api/auth/sign-up/email`, { method:"POST", headers:{ origin, "content-type":"application/json" }, body:JSON.stringify({ name:"Synthetic", email, password:"synthetic-only-password-123" }) });
+  assert.equal(signup.status,200);
+  const cookie = signup.headers.getSetCookie().find(value=>value.startsWith("better-auth.session_token="))?.split(";")[0];
+  assert.ok(cookie);
+  const session = await fetch(`${base(newServer)}/api/auth/get-session`,{headers:{origin,cookie}});
+  assert.equal(session.status,200);
+  const body = await session.json() as { user?: { email?: string } } | null;
+  assert.equal(body?.user?.email,email);
+  const logout = await fetch(`${base(newServer)}/api/auth/sign-out`,{method:"POST",headers:{origin,cookie,"content-type":"application/json"},body:"{}"});
+  assert.equal(logout.status,200);
+  const revoked = await fetch(`${base(oldServer)}/api/auth/get-session`,{headers:{origin,cookie}});
+  assert.equal(await revoked.json(),null);
+  console.log("PASS: 1.6.20 session accepted by 1.7.14 and revocation observed by 1.6.20 against disposable PostgreSQL");
+} finally {
+  await Promise.all([oldServer,newServer].map(server=>new Promise<void>((resolve,reject)=>server.close(error=>error?reject(error):resolve()))));
+  await prisma.$disconnect();
+}
