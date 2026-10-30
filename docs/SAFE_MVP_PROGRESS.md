@@ -13,19 +13,21 @@ Updated: 2026-10-30. This ledger records local evidence and blockers, not deploy
 
 - RPF-SEC-002BE: commit `0fbad01d0eaa697461324eb25498e4c594dcf895` updates Better Auth, Express/body-parser, proxy-addr and the Vitest/Vite toolchain. 75 tests, lint, typecheck, isolated build, PostgreSQL-backed auth/API tests and old-session compatibility passed. Critical backend audit findings dropped from 4 to 0; 6 high findings remain.
 
-- RPF-SEC-003BE: this commit updates Zod and Prisma, preserving the original UUID contract and JSON records. 75 tests, lint, typecheck, build, disposable PostgreSQL migration/status, 24 negative evidence checks and auth/API regression passed. Backend audit: 0 critical, 0 high, 1 low. The frontend pinned contract requires reconciliation.
+- RPF-SEC-003BE: commit `108095993b26d64108fe127035a7fd72718064c3` updates Zod and Prisma, preserving the original UUID contract and JSON records. 75 tests, lint, typecheck, build, disposable PostgreSQL migration/status, 24 negative evidence checks and auth/API regression passed. Backend audit: 0 critical, 0 high, 1 low. The frontend pinned contract requires reconciliation.
+
+- RPF-SEC-002FE: frontend commit `70c1d8c316783ab1c3dc1bafd7e8437c5eb0cf0f` updates Next, Zod and Vitest. Six tests, lint, typecheck, build, clean npm ci, contract parity and disposable PostgreSQL-backed browser regression passed. Frontend audit reports zero findings. The browser exercised a separate review copy of pending RPF-013S UI, not the security commit alone.
 
 ## Active work and blockers
 
 - RPF-001C remains IN_PROGRESS: live frontend/backend request, authorization, error-envelope and report integration are unverified. Existing tested but uncommitted work remains in `rpf001c-backend-worktree` and `rpf001c-frontend-worktree`; RPF-012S reused its backend error-envelope helper without modifying those worktrees. The frontend parser remains unintegrated.
 - RPF-004 remains IN_PROGRESS in its original dirty worktree. Its runner has no independent isolation or real execution evidence. RPF-006A remains DEFERRED by user instruction. RPF-010B, RPF-011B and RPF-012A remain blocked by their recorded dependencies.
-- RPF-013S has uncommitted UI code in `rpf013s-worktree`: 14 unit tests, production build and real browser signup/session/catalog/503/logout integration passed with a disposable PostgreSQL database; no run/evidence rows were created. The branch is not yet committed. Existing frontend audit reports 2 critical and 2 high findings; backend has 1 low finding after RPF-SEC-003BE. Remediation is required before declaring security readiness.
+- RPF-013S has uncommitted UI code in `rpf013s-worktree`: 14 unit tests, production build and real browser signup/session/catalog/503/logout integration passed with a disposable PostgreSQL database; no run/evidence rows were created. The branch is not yet committed. The original frontend audit had 2 critical and 2 high findings; RPF-SEC-002FE reports zero findings. Backend has 1 low finding after RPF-SEC-003BE.
 - The integrated MVP still needs safe persisted run workflows, authorized report/evidence retrieval and staging verification. RPF-012S does not create or persist a run.
 - No staging provider, credentials, spending or infrastructure has been authorized. Do not claim deployment or production readiness.
 
 ## Next actions
 
-Complete RPF-SEC-002FE security remediation, then reconcile the tested RPF-013S and RPF-001C frontend changes without overwriting their worktrees. Identify a separately scoped safe persistence path without enabling runner execution or weakening RPF-012A/010B prerequisites. Update this ledger as tickets are completed, recording their actual commit SHAs and checks.
+Reconcile the tested RPF-013S and RPF-001C frontend changes without overwriting their worktrees. Identify a separately scoped safe persistence path without enabling runner execution or weakening RPF-012A/010B prerequisites. Update this ledger as tickets are completed, recording their actual commit SHAs and checks.
 
 ## Approved workflow exception
 
