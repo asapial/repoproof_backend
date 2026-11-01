@@ -89,6 +89,8 @@ Status options: `TODO`, `IN_PROGRESS`, `BLOCKED`, `DONE`, `DEFERRED`. Edit one t
 
 ## Standard ticket closeout
 
+- **RPF-HYG-002 DONE (documentation only):** inspected all five stale D: registrations and their existing I: directories via explicit read-only Git paths. Recorded exact HEADs and preserved the dirty fixture in `.rpf-002-patched-f56bcb6`. `docs/WORKTREE_REPAIR_PLAN.md` documents approval, backup, identity and post-repair checks. No repair/prune/delete/move or fixture execution occurred. Documentation diff checks passed.
+
 - Actual repository, branch and commit SHA(s)
 - Exact observed test commands, passed/failed/skipped totals; residual untested risks
 - Files committed and any pre-existing unrelated dirty files preserved
