@@ -5,7 +5,7 @@ import { type MetaCatalogClient } from "./catalog";
 
 const sha = z.string().regex(/^[a-f0-9]{64}$/);
 const path = z.string().regex(/^src\/(?:[A-Za-z0-9_-]+\/)*[A-Za-z0-9_-]+\.(?:js|mjs|ts)$/).max(240);
-const patchPathAllowed = (value: string) => path.safeParse(value).success && !/(?:^|\/)(?:tests?|__tests__|node_modules|runner|sandbox|isolation|verification|meta|config|contracts|scripts)(?:\/|$)/i.test(value) && !/(?:^|\/)(?:metaAdapter|runnerPolicy|fixturePolicy|secrets?|credentials?|regressions?)\.(?:js|mjs|ts)$/i.test(value);
+const patchPathAllowed = (value: string) => path.safeParse(value).success && !/(?:^|\/)(?:tests?|__tests__|node_modules|runner|sandbox|isolation|execution|verification|meta|config|contracts|scripts)(?:\/|$)/i.test(value) && !/(?:^|\/)(?:metaAdapter|runnerPolicy|fixturePolicy|secrets?|credentials?|regressions?)\.(?:js|mjs|ts)$/i.test(value);
 export const modelSourceSchema = z.object({ baseSha: z.string().regex(/^[a-f0-9]{40}$/), issue: z.object({ number: z.number().int().positive(), title: z.string().min(1).max(500), body: z.string().min(1).max(16000) }).strict(), files: z.array(z.object({ path, content: z.string().max(16000), sha256: sha }).strict()).min(1).max(8) }).strict();
 export type ModelSource = z.infer<typeof modelSourceSchema>;
 export const issueAnalysisSchema = z.object({ summary: z.string().min(1).max(2000), relevantPaths: z.array(path).min(1).max(8), reproducibleHypothesis: z.string().min(1).max(2000) }).strict();

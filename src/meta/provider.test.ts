@@ -68,7 +68,7 @@ describe("Meta account catalog and task contracts — offline only", () => {
     expect(JSON.parse(JSON.parse(String(h.transport.mock.calls[1]![1]!.body)).messages[1].content).allowedSourcePaths).toEqual(["src/owned.mjs"]);
     for (const modified of [{ ...data, baseSha: "b".repeat(40) }, { ...data, changes: [{ ...data.changes[0], previousSha256: "b".repeat(64) }] }, { ...data, changes: [...data.changes, ...data.changes] }]) await expect(setup(modified).provider.generateSourcePatch(input, ["src/owned.mjs"])).rejects.toMatchObject({ code: "INVALID_RESPONSE" });
   });
-  it.each(["../secret", "tests/issue.mjs", "src/runner/policy.ts", "src/meta/access.ts", "src/config/env.ts", "package-lock.json", ".github/workflows/ci.yml", "src/tests/a.ts", "src/utils/metaAdapter.ts", "src/secrets.ts", "src/isolation/assessment.ts"])("rejects protected patch scope %s before any provider request", async path => {
+  it.each(["../secret", "tests/issue.mjs", "src/runner/policy.ts", "src/meta/access.ts", "src/config/env.ts", "package-lock.json", ".github/workflows/ci.yml", "src/tests/a.ts", "src/utils/metaAdapter.ts", "src/secrets.ts", "src/isolation/assessment.ts", "src/execution/replay.ts"])("rejects protected patch scope %s before any provider request", async path => {
     const h = setup(); const input = source(); if (path.startsWith("src/")) input.files[0]!.path = path;
     await expect(h.provider.generateSourcePatch(input, [path])).rejects.toMatchObject({ code: "INVALID_REQUEST" }); expect(h.transport).not.toHaveBeenCalled();
   });

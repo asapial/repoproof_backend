@@ -1,0 +1,21 @@
+// Durable anti-replay foundation only. No execution/Run/verdict authorization.
+model ExecutionReplayGroup {
+  namespace String   @db.VarChar(32)
+  groupId   String   @db.Uuid
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  expiresAt DateTime @db.Timestamptz(3)
+  items     ExecutionReplayItem[]
+
+  @@id([namespace, groupId])
+}
+
+model ExecutionReplayItem {
+  namespace String   @db.VarChar(32)
+  itemId    String   @db.Uuid
+  nonce     String   @db.Char(64)
+  groupId   String   @db.Uuid
+  group     ExecutionReplayGroup @relation(fields: [namespace, groupId], references: [namespace, groupId], onDelete: Restrict)
+
+  @@id([namespace, itemId])
+  @@unique([namespace, nonce])
+}

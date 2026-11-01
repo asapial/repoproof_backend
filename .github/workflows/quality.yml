@@ -107,3 +107,16 @@ jobs:
           DIRECT_URL=postgresql://rpf_test@127.0.0.1:35440/rpf_db001_disposable npx --no-install prisma migrate status
           DATABASE_URL=postgresql://rpf_runtime_predeploy@127.0.0.1:35440/rpf012s_disposable RPF_TEST_ADMIN_DATABASE_URL=postgresql://rpf_test@127.0.0.1:35440/rpf012s_disposable RPF_LOCAL_DB_GATE=1 npx --no-install tsx integration/rpfdb001-runtime.ts
           DATABASE_URL=postgresql://rpf_runtime_predeploy@127.0.0.1:35440/rpf012s_disposable RPF_LOCAL_DB_GATE=1 npx --no-install tsx integration/rpfsec006-security.ts
+      - name: Independent durable replay database
+        working-directory: backend
+        env:
+          PGHOST: 127.0.0.1
+          PGPORT: '35440'
+          PGUSER: rpf_test
+          PGDATABASE: rpf012s_disposable
+        run: |
+          psql -v ON_ERROR_STOP=1 -f integration/rpfreplay001-bootstrap.sql
+          DIRECT_URL=postgresql://rpf_test@127.0.0.1:35440/rpf_engine_disposable npx --no-install prisma migrate deploy
+          DIRECT_URL=postgresql://rpf_test@127.0.0.1:35440/rpf_engine_disposable npx --no-install prisma migrate status
+          PGDATABASE=rpf_engine_disposable psql -v approved_database=rpf_engine_disposable -v replay_role=rpf_engine_replay -f deploy/replay-grants.sql
+          DATABASE_URL=postgresql://rpf_engine_replay@127.0.0.1:35440/rpf_engine_disposable RPF_REPLAY_ADMIN_URL=postgresql://rpf_test@127.0.0.1:35440/rpf_engine_disposable RPF_REPLAY_GATE=1 npx --no-install tsx integration/rpfreplay001-postgres.ts
