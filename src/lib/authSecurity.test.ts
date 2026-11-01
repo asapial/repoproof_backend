@@ -8,9 +8,9 @@ import { authSecurityOptions } from "./authSecurity";
 import type { AddressInfo } from "node:net";
 
 const origin = "http://localhost:3000";
-async function withServer(production: boolean, test: (base: string) => Promise<void>) {
+async function withServer(production: boolean, test: (base: string) => Promise<void>, sameOrigin = false) {
   const security = securityConfig(production ? "https://frontend.example" : origin, production);
-  const auth = betterAuth({ ...authSecurityOptions(security.allowedOrigin, production), baseURL: "http://localhost:3001", secret: "test-only-secret-with-at-least-32-characters" });
+  const auth = betterAuth({ ...authSecurityOptions(security.allowedOrigin, production, sameOrigin), baseURL: sameOrigin ? security.allowedOrigin : "http://localhost:3001", secret: "test-only-secret-with-at-least-32-characters" });
   const router = Router();
   router.post("/test", (_req, res) => res.json({ ok: true }));
   const app = createApp(toNodeHandler(auth), router, security.allowedOrigin, production, production ? "https://backend.example" : "http://localhost:3001");
@@ -68,5 +68,13 @@ describe("authentication and origin security", () => {
   it("rejects wildcard, non-origin and insecure production configuration", () => {
     for (const url of ["https://*.example.com", "https://example.com/path", "http://localhost:3000", "https://user:password@example.com"]) expect(() => securityConfig(url, true)).toThrow();
     expect(() => securityConfig("https://frontend.example", true, "http://backend.example")).toThrow();
+  });
+  it("uses host-only Secure HttpOnly Lax cookies for a same-origin production proxy", async () => {
+    await withServer(true, async base => {
+      const response = await fetch(`${base}/api/auth/sign-up/email`, { method: "POST", headers: { origin: "https://frontend.example", "content-type": "application/json" }, body: JSON.stringify({ name: "Proxy test", email: "proxy@example.test", password: "synthetic-password-123" }) });
+      expect(response.status).toBe(200);
+      const cookie = response.headers.getSetCookie().find(value => value.startsWith("__Secure-better-auth.session_token="));
+      expect(cookie).toMatch(/Secure/i); expect(cookie).toMatch(/HttpOnly/i); expect(cookie).toMatch(/SameSite=Lax/i); expect(cookie).not.toMatch(/Domain=/i);
+    }, true);
   });
 });

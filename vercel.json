@@ -1,0 +1,9 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "express",
+  "installCommand": "npm ci --ignore-scripts",
+  "buildCommand": "npm run build:vercel",
+  "functions": {
+    "src/app.ts": { "maxDuration": 15 }
+  }
+}

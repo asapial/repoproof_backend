@@ -3,3 +3,12 @@ node_modules
 .env
 
 /generated/prisma
+
+# Local credentials, provider metadata and generated bundles
+.env.*
+!.env.example
+.vercel/
+api/
+function-build/
+coverage/
+*.log

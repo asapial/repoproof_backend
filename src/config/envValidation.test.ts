@@ -10,7 +10,7 @@ describe("environment validation", () => {
     expect(() => result.OpenRouter_API_KEY).toThrow(/disabled/); expect(() => result.ACCESS_TOKEN_SECRET).toThrow(/disabled/);
   });
   it("rejects each missing core value, invalid URLs, weak secrets and invalid flags", () => {
-    for (const name of Object.keys(core)) { const invalid: Record<string, string | undefined> = { ...core, [name]: undefined }; expect(() => parseEnvironment(invalid)).toThrow(name); }
+    for (const name of Object.keys(core).filter(name => name !== "PORT")) { const invalid: Record<string, string | undefined> = { ...core, [name]: undefined }; expect(() => parseEnvironment(invalid)).toThrow(name); }
     for (const invalid of [{ PORT: "0" }, { PORT: "99999" }, { NODE_ENV: "prod" }, { DATABASE_URL: "https://example.test/db" }, { DATABASE_URL: "postgresql://localhost/" }, { BETTER_AUTH_SECRET: "short" }, { FRONTEND_URL: "http://example.test" }, { BETTER_AUTH_URL: "https://user:pass@example.test" }, { BETTER_AUTH_URL: "https://api.example.test/path" }, { ENABLE_OPENROUTER: "yes" }]) expect(() => parseEnvironment({ ...core, ...invalid })).toThrow();
   });
   it("requires every provider credential when its integration is enabled", () => {
@@ -43,5 +43,9 @@ describe("environment validation", () => {
   it("accepts development HTTP and ignores credentials for explicitly disabled providers", () => {
     expect(parseEnvironment({ ...core, NODE_ENV: "development", FRONTEND_URL: "http://localhost:3000", BETTER_AUTH_URL: "http://localhost:5000" }).NODE_ENV).toBe("development");
     expect(parseEnvironment({ ...core, ENABLE_GOOGLE_OAUTH: "false", GOOGLE_CALLBACK_URL: "invalid", ENABLE_OPENROUTER: "false", OpenRouter_API_KEY: "unused" }).GOOGLE).toBeNull();
+  });
+  it("does not require a listening port for a serverless application import", () => {
+    expect(parseEnvironment({ ...core, PORT: undefined }).PORT).toBe("5000");
+    expect(() => parseEnvironment({ ...core, PORT: "" })).toThrow("PORT");
   });
 });

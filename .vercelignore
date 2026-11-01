@@ -1,0 +1,14 @@
+# Only application sources, Prisma schema/client and package metadata deploy.
+.git
+.github
+.agents
+.env*
+docs
+fixtures
+integration
+scripts
+api
+function-build
+coverage
+**/*.test.ts
+**/*.test.mjs

@@ -72,7 +72,7 @@ export function parseEnvironment(input: Environment) {
   const legacy: LegacyJwtConfig | null = jwtEnabled ? { accessSecret: secret(input, "ACCESS_TOKEN_SECRET"), refreshSecret: secret(input, "REFRESH_TOKEN_SECRET"), accessExpiresIn: lifetime(input, "ACCESS_TOKEN_EXPIRES_IN"), refreshExpiresIn: lifetime(input, "REFRESH_TOKEN_EXPIRES_IN") } : null;
   const getLegacy = () => { if (!legacy) throw new Error("Legacy JWT integration is disabled"); return legacy; };
   return {
-    NODE_ENV: runtime, PORT: port(input, "PORT"), DATABASE_URL: database,
+    NODE_ENV: runtime, PORT: input.PORT === undefined ? "5000" : port(input, "PORT"), DATABASE_URL: database,
     BETTER_AUTH_SECRET: secret(input, "BETTER_AUTH_SECRET"),
     SESSION: { expiresIn: sessionExpiresIn, updateAge: sessionUpdateAge },
     BETTER_AUTH_URL: origin(input, "BETTER_AUTH_URL", production), FRONTEND_URL: origin(input, "FRONTEND_URL", production),

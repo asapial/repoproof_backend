@@ -2,7 +2,10 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "src/app.ts",
+  "engines": {
+    "node": "24.x"
+  },
   "scripts": {
     "check": "node scripts/quality.mjs",
     "test": "vitest run",
@@ -13,8 +16,10 @@
     "seeding": "npx tsx src/scripts/seedingAdmin.ts",
     "migrate": "npx prisma migrate dev",
     "generate": "npx prisma generate",
+    "build:vercel": "prisma generate",
+    "build:function": "prisma generate && tsup src/app.ts --format esm --platform node --target node24 --outDir function-build --external pg-native",
     "postinstall": "prisma generate",
-    "build": "prisma generate && tsup src/server.ts --format esm --platform node --target node20 --outDir api --external pg-native"
+    "build": "prisma generate && tsup src/server.ts --format esm --platform node --target node24 --outDir api --external pg-native"
   },
   "keywords": [],
   "author": "",
@@ -26,6 +31,7 @@
     "@types/express": "^5.0.6",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^26.0.1",
+    "@types/pg": "8.20.0",
     "eslint": "10.14.0",
     "prisma": "7.10.1",
     "tsup": "^8.5.1",
@@ -38,6 +44,7 @@
   "dependencies": {
     "@prisma/adapter-pg": "7.10.1",
     "@prisma/client": "7.10.1",
+    "@vercel/functions": "3.10.5",
     "better-auth": "1.7.14",
     "cloudinary": "^2.10.0",
     "cookie-parser": "^1.4.7",
@@ -46,6 +53,7 @@
     "express": "5.3.0",
     "http-status": "^2.1.0",
     "jsonwebtoken": "^9.0.3",
+    "pg": "8.22.0",
     "zod": "4.6.7"
   },
   "allowScripts": {
@@ -55,6 +63,9 @@
     "prisma@7.10.1": true
   },
   "overrides": {
+    "@vercel/cli-config": {
+      "zod": "4.6.7"
+    },
     "tsup": {
       "esbuild": "0.28.1"
     },

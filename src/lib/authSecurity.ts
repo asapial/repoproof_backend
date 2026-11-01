@@ -1,7 +1,7 @@
 import { betterAuth } from "better-auth";
 
 // The same options are used by production and the in-memory integration tests.
-export function authSecurityOptions(frontendOrigin: string, production: boolean) {
+export function authSecurityOptions(frontendOrigin: string, production: boolean, sameOrigin = false) {
   return {
     trustedOrigins: [frontendOrigin],
     emailAndPassword: { enabled: true },
@@ -12,7 +12,7 @@ export function authSecurityOptions(frontendOrigin: string, production: boolean)
       crossSubDomainCookies: { enabled: false },
       disableCSRFCheck: false,
       disableOriginCheck: false,
-      defaultCookieAttributes: { sameSite: production ? "none" as const : "lax" as const, secure: production, httpOnly: true, path: "/" },
+      defaultCookieAttributes: { sameSite: production && !sameOrigin ? "none" as const : "lax" as const, secure: production, httpOnly: true, path: "/" },
     },
   } satisfies Parameters<typeof betterAuth>[0];
 }

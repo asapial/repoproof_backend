@@ -84,3 +84,12 @@ jobs:
           npx --no-install tsx integration/rpf012d-drafts.ts
           npx --no-install tsx integration/rpf012s-db.ts
           node integration/rpfstg001-production.mjs
+      - name: Exported Function bundle without a listener
+        working-directory: backend
+        env:
+          NODE_ENV: production
+          BETTER_AUTH_URL: https://web.example.test
+          FRONTEND_URL: https://web.example.test
+        run: |
+          npm run build:function
+          env -u PORT node integration/rpfvcl001-function.mjs
