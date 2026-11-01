@@ -18,7 +18,7 @@ export async function runAdminOwnedFixtureSmoke(headers: Headers, signal?: Abort
     try {
       const result = await executeOwnedSmoke(config, session.user.id, files, control, undefined, signal);
       // Fixed enumerated fields only. Do not log headers, errors, stdout or IDs.
-      console.info(JSON.stringify({ event: "sandbox_smoke", ...result }));
+      console.info(JSON.stringify({ event: "sandbox_smoke", status: result.status, cleanupConfirmed: result.cleanupConfirmed, commands: result.commands }));
       return result;
     } finally { await control.close(); }
   } catch {

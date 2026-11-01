@@ -1,8 +1,10 @@
 import { beforeAll, afterEach, describe, expect, it, vi } from "vitest";
-import { executeOwnedSmoke, oneCreateFetch, vercelSmokeProvider, type SmokeProvider, type SmokeSandbox } from "./adapter";
+import { executeOwnedSmoke, oneCreateFetch, vercelSmokeProvider, type SmokeProvider, type SmokeSandbox, type CommandOptions } from "./adapter";
 import { loadOwnedFixture, validateFixture, type FixtureFile } from "./fixture";
 import { smokeConfig, type SmokeConfig } from "./policy";
 import { runAdminOwnedFixtureSmoke } from "./admin";
+import { Sandbox } from "@vercel/sandbox";
+import { hash, smokeReceiptSchema } from "./receipt";
 
 const config: SmokeConfig = { enabled: true, adminId: "owned-admin", projectId: "prj_owned", teamId: "team_owned", token: "synthetic-sdk-secret", image: `registry.vercel.com/owned/node@sha256:${"a".repeat(64)}`, nodeVersion: "v24.22.2", databaseUrl: "postgresql://synthetic@localhost/disposable" };
 let files: FixtureFile[];
@@ -12,8 +14,9 @@ afterEach(() => { vi.restoreAllMocks(); vi.unstubAllGlobals(); vi.unstubAllEnvs(
 function harness() {
   const exits = [0, 0, 1, 0, 0];
   const instance: SmokeSandbox = { persistent: false,
+    observe: vi.fn(() => ({ sandboxName: "offline-owned", sessionId: "offline-session", image: config.image, networkPolicy: "deny-all", persistent: false, vcpus: 1, memoryMb: 2048, timeoutMs: 30000, createdAt: new Date().toISOString() })),
     writeFiles: vi.fn(async () => {}), runCommand: vi.fn(async () => ({ exitCode: exits.shift() ?? 0 })),
-    stop: vi.fn(async () => ({ status: "stopped" })),
+    stop: vi.fn(async () => ({ status: "stopped", sessionId: "offline-session", snapshotCreated: false })),
   };
   const provider = { create: vi.fn(async (options: Parameters<SmokeProvider["create"]>[0]) => { void options; return instance; }) } satisfies SmokeProvider;
   const control = { claim: vi.fn(async () => true), finish: vi.fn(async () => {}) };
@@ -35,7 +38,7 @@ describe("owned Sandbox offline control (no fixture execution)", () => {
       SANDBOX_TEAM_ID: config.teamId, SANDBOX_PROJECT_ID: config.projectId, SANDBOX_IMAGE: config.image,
       SANDBOX_NODE_VERSION: config.nodeVersion, SANDBOX_CONTROL_DATABASE_URL: config.databaseUrl };
     expect(smokeConfig(env)).toEqual(config);
-    for (const override of [{ SANDBOX_IMAGE: "vercel/sandbox/node:24" }, { SANDBOX_PROJECT_ID: "*" }, { SANDBOX_NODE_VERSION: "node24" }]) expect(() => smokeConfig({ ...env, ...override })).toThrow();
+    for (const override of [{ SANDBOX_IMAGE: "vercel/sandbox/node:24" }, { SANDBOX_PROJECT_ID: "*" }, { SANDBOX_NODE_VERSION: "node24" }, { DEBUG_FETCH: "true" }]) expect(() => smokeConfig({ ...env, ...override })).toThrow();
   });
   it("rejects non-admin and already cancelled requests before consuming permission", async () => {
     const h = harness();
@@ -61,9 +64,9 @@ describe("owned Sandbox offline control (no fixture execution)", () => {
   });
   it("uses deny-all, nonpersistent 1CPU/2GiB, no ports/source/mounts or application env", async () => {
     const h = harness();
-    expect(await h.run()).toEqual({ status: "SMOKE_FINISHED", cleanupConfirmed: true, commands: 5 });
+    expect(await h.run()).toMatchObject({ status: "SMOKE_FINISHED", cleanupConfirmed: true, commands: 5 });
     expect(h.provider.create.mock.calls[0]![0]).toEqual({ token: config.token, teamId: config.teamId, projectId: config.projectId,
-      image: config.image, timeout: 30000, resources: { vcpus: 1 }, persistent: false, networkPolicy: "deny-all", env: {}, ports: [], signal: expect.any(AbortSignal) });
+      image: config.image, timeout: 30000, resources: { vcpus: 1 }, persistent: false, networkPolicy: "deny-all", env: {}, ports: [], mounts: {}, signal: expect.any(AbortSignal) });
     expect(h.instance.writeFiles).toHaveBeenCalledWith(files.map(file => ({ ...file, path: `/vercel/sandbox/${file.path}` })), expect.anything());
     const calls = vi.mocked(h.instance.runCommand).mock.calls;
     expect(calls[2]![0].args).toEqual(["--test", "tests/issue.mjs"]);
@@ -140,5 +143,48 @@ describe("owned Sandbox offline control (no fixture execution)", () => {
     expect((await guarded("https://api.vercel.com/v3/sandboxes", { method: "POST" })).status).toBe(409);
     await expect(guarded("https://api.vercel.com/v2/sandboxes/owned/stop", { method: "POST" })).rejects.toThrow();
     expect(transport).toHaveBeenCalledTimes(2);
+  });
+  it("captures identity, timestamps, command hashes/exits and redacted per-stream hashes", async () => {
+    const h = harness();
+    vi.mocked(h.instance.runCommand).mockImplementation(async options => {
+      options.stdout.write(config.token); options.stderr.write("owned-error-stream");
+      return { exitCode: options.args.includes("tests/issue.mjs") ? 1 : 0 };
+    });
+    const result = await h.run(); const receipt = smokeReceiptSchema.parse(result.receipt);
+    expect(result.status).toBe("SMOKE_FINISHED"); expect(receipt.trust).toBe("UNVERIFIED_SDK_OBSERVATION");
+    expect(receipt.provider).toMatchObject({ sessionId: "offline-session", persistent: false, networkPolicy: "deny-all", vcpus: 1, memoryMb: 2048 });
+    expect(receipt.commands.map(command => command.exitCode)).toEqual([0,0,1,0,0]);
+    expect(receipt.commands.map(command => command.commandId)).toEqual(["runtime","hash_before","issue","regressions","hash_after"]);
+    expect(receipt.commands[0]).toMatchObject({ stdoutSha256: hash(config.token), stdoutBytes: Buffer.byteLength(config.token), stderrSha256: hash("owned-error-stream") });
+    expect(receipt.cleanup).toMatchObject({ status: "STOPPED", snapshotCreated: false });
+    expect(Date.parse(receipt.finishedAt)).toBeGreaterThanOrEqual(Date.parse(receipt.startedAt));
+    expect(JSON.stringify(receipt)).not.toContain(config.token); expect(JSON.stringify(receipt)).not.toContain("owned-error-stream");
+  });
+  it("rejects mismatched policy/resources or secret-bearing metadata before upload", async () => {
+    for (const override of [{ networkPolicy: "allow-all" }, { vcpus: 2 }, { memoryMb: 4096 }, { persistent: true }, { timeoutMs: 60000 }, { sessionId: config.token }]) {
+      const h = harness(); const observation = h.instance.observe(); vi.mocked(h.instance.observe).mockReturnValue({ ...observation as object, ...override });
+      expect((await h.run()).status).not.toBe("SMOKE_FINISHED"); expect(h.instance.writeFiles).not.toHaveBeenCalled(); expect(h.instance.stop).toHaveBeenCalledTimes(1);
+    }
+  });
+  it("does not confirm cleanup for another session or an unexpected snapshot", async () => {
+    for (const override of [{ sessionId: "different-session" }, { snapshotCreated: true }]) {
+      const h = harness(); vi.mocked(h.instance.stop).mockResolvedValue({ status: "stopped", sessionId: "offline-session", snapshotCreated: false, ...override });
+      const result = await h.run(); expect(result.status).toBe("CLEANUP_UNCONFIRMED"); expect(result.receipt?.cleanup.status).toBe("UNKNOWN"); expect(h.control.finish).toHaveBeenCalledWith(false);
+    }
+  });
+  it("retains partial command receipt on abort without inventing an exit code", async () => {
+    const h = harness(); const abort = new AbortController();
+    vi.mocked(h.instance.runCommand).mockImplementation(async () => { abort.abort(); return new Promise(() => {}); });
+    const result = await h.run(abort.signal); expect(result.status).toBe("CANCELLED"); expect(result.receipt?.commands).toHaveLength(1); expect(result.receipt?.commands[0]?.exitCode).toBeNull();
+  });
+  it("pins SDK file/command/stop calls to the original session without parent resume", async () => {
+    const session = { sessionId: "offline-session", networkPolicy: "deny-all", vcpus: 1, memory: 2048, timeout: 30000, createdAt: new Date(),
+      writeFiles: vi.fn(async () => {}), runCommand: vi.fn(async (options: CommandOptions) => ({ exitCode: options.args.includes("tests/issue.mjs") ? 1 : 0 })), stop: vi.fn(async () => ({ session: { status: "stopped", id: "offline-session" } })) };
+    const sdk = { persistent: false, name: "offline-owned", image: config.image, currentSession: vi.fn(() => session),
+      writeFiles: vi.fn(), runCommand: vi.fn(), stop: vi.fn() };
+    vi.spyOn(Sandbox, "create").mockResolvedValue(sdk as unknown as Awaited<ReturnType<typeof Sandbox.create>>);
+    const h = harness(); const result = await executeOwnedSmoke(config, config.adminId, files, h.control, vercelSmokeProvider);
+    expect(result.status).toBe("SMOKE_FINISHED"); expect(sdk.currentSession).toHaveBeenCalledTimes(1);
+    expect(session.writeFiles).toHaveBeenCalledTimes(1); expect(session.runCommand).toHaveBeenCalledTimes(5); expect(session.stop).toHaveBeenCalledTimes(1); expect(sdk.writeFiles).not.toHaveBeenCalled(); expect(sdk.runCommand).not.toHaveBeenCalled(); expect(sdk.stop).not.toHaveBeenCalled();
   });
 });

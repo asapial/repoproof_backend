@@ -9,6 +9,7 @@ export type SmokeConfig = {
 export function smokeConfig(input: Readonly<Record<string, string | undefined>>): SmokeConfig | null {
   if (input.SANDBOX_SMOKE_ENABLED === undefined || input.SANDBOX_SMOKE_ENABLED === "false") return null;
   if (input.SANDBOX_SMOKE_ENABLED !== "true") throw new Error("Invalid sandbox configuration");
+  if (input.DEBUG_FETCH === "true") throw new Error("Invalid sandbox configuration");
   const required = (name: string) => {
     const value = input[name];
     if (!value || value.length > 4096 || /[\x00-\x20\x7f]/.test(value)) throw new Error("Invalid sandbox configuration");

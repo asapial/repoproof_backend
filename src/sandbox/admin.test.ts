@@ -25,11 +25,12 @@ it("requires a real resolved session matching the operator-controlled user ID", 
 it("passes only authenticated admin and validates fixture before the control connection", async () => {
   enable(); const headers = new Headers({ origin: "https://web.example", cookie: "private-cookie" });
   mocks.session.mockResolvedValue({ user: { id: "operator-id" } }); mocks.fixture.mockResolvedValue([]);
-  mocks.execute.mockResolvedValue({ status: "SMOKE_FINISHED", cleanupConfirmed: true, commands: 5 });
+  mocks.execute.mockResolvedValue({ status: "SMOKE_FINISHED", cleanupConfirmed: true, commands: 5, receipt: { provider: { sessionId: "private-provider-id" } } });
   const log = vi.spyOn(console, "info").mockImplementation(() => {});
   expect((await runAdminOwnedFixtureSmoke(headers)).status).toBe("SMOKE_FINISHED");
   expect(mocks.session).toHaveBeenCalledWith({ headers }); expect(mocks.execute.mock.calls[0]![1]).toBe("operator-id");
   expect(mocks.close).toHaveBeenCalledTimes(1); expect(JSON.stringify(log.mock.calls)).not.toMatch(/private-cookie|synthetic-secret/);
+  expect(JSON.stringify(log.mock.calls)).not.toContain("private-provider-id");
 });
 it("redacts auth/provider errors and closes its own connection", async () => {
   enable(); mocks.session.mockResolvedValue({ user: { id: "operator-id" } }); mocks.fixture.mockResolvedValue([]);
