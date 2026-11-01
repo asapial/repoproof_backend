@@ -1,0 +1,27 @@
+// Internal control-plane foundation. No Run, verdict, provider or API activation.
+model ExecutionJob {
+  id              String   @id @db.Uuid
+  ownerId         String   @db.VarChar(128)
+  idempotencyKey  String   @db.Uuid
+  requestHash     String   @db.Char(64)
+  state           String   @default("QUEUED") @db.VarChar(16)
+  version         Int      @default(0)
+  attempts        Int      @default(0)
+  cancelRequested Boolean  @default(false)
+  createdAt       DateTime @default(now()) @db.Timestamptz(3)
+  deadlineAt      DateTime @db.Timestamptz(3)
+  leaseHash       String?  @db.Char(64)
+  leaseExpiresAt  DateTime? @db.Timestamptz(3)
+  effect          ExecutionEffect?
+
+  @@unique([ownerId, idempotencyKey])
+}
+
+model ExecutionEffect {
+  id          String   @id @db.Uuid
+  jobId       String   @unique @db.Uuid
+  kind        String   @db.VarChar(16)
+  requestHash String   @db.Char(64)
+  createdAt   DateTime @default(now()) @db.Timestamptz(3)
+  job         ExecutionJob @relation(fields: [jobId], references: [id], onDelete: Restrict)
+}

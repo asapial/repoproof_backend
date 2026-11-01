@@ -27,14 +27,21 @@ no actual account catalog or enforceable $0 inference entitlement has been prove
 RPF-SBX-002 completed smoke receipt preparation; RPF-ISO-001 prepared independent
 statement validation and minimal owned probes. None completes a parent above.
 
+RPF-REPLAY-001 and RPF-JOB-001 now provide independently tested PostgreSQL
+replay reservations and a conservative job/lease/possible-effect foundation.
+They do not activate the RPF-011B stage machine or dispatch external effects.
+Unknown effects quarantine the one global slot until separate reconciliation
+exists. See DURABLE_REPLAY.md and DURABLE_JOBS.md for their actual limits.
+
 ## Eligible independent local components
 
 Keep each separately scoped, tested and committed, with honest parent status:
 
-- Durable PostgreSQL replay, job ownership/leases, compare-and-swap transitions,
-  cancellation/deadlines and provider-effect reservations. An uncertain submitted
-  model/create effect must quarantine instead of automatically resending after
-  an expired lease. No in-memory background execution after an HTTP response.
+- Durable multi-stage orchestration, quota/zero-charge entitlement and usage
+  accounting, independent resource observations and effect reconciliation on top
+  of the replay/job foundations. An uncertain submitted model/create effect must
+  remain quarantined rather than automatically resend after an expired lease.
+  No in-memory background execution after an HTTP response.
 - Bounded structured-result decoding and an owned reporter protocol. Test output
   alone is not authentic: raw/zero/skipped/setup/timeouts cannot authorize VERIFIED.
 - Owned-fixture test/source AST admissibility, exact-byte freezing and constrained

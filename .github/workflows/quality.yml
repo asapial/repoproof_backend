@@ -120,3 +120,14 @@ jobs:
           DIRECT_URL=postgresql://rpf_test@127.0.0.1:35440/rpf_engine_disposable npx --no-install prisma migrate status
           PGDATABASE=rpf_engine_disposable psql -v approved_database=rpf_engine_disposable -v replay_role=rpf_engine_replay -f deploy/replay-grants.sql
           DATABASE_URL=postgresql://rpf_engine_replay@127.0.0.1:35440/rpf_engine_disposable RPF_REPLAY_ADMIN_URL=postgresql://rpf_test@127.0.0.1:35440/rpf_engine_disposable RPF_REPLAY_GATE=1 npx --no-install tsx integration/rpfreplay001-postgres.ts
+      - name: Independent durable job and lease foundation
+        working-directory: backend
+        env:
+          PGHOST: 127.0.0.1
+          PGPORT: '35440'
+          PGUSER: rpf_test
+          PGDATABASE: rpf_engine_disposable
+        run: |
+          psql -v ON_ERROR_STOP=1 -f integration/rpfjob001-bootstrap.sql
+          psql -v approved_database=rpf_engine_disposable -v worker_role=rpf_engine_jobs -f deploy/job-grants.sql
+          DATABASE_URL=postgresql://rpf_engine_jobs@127.0.0.1:35440/rpf_engine_disposable RPF_JOB_ADMIN_URL=postgresql://rpf_test@127.0.0.1:35440/rpf_engine_disposable RPF_JOB_GATE=1 npx --no-install tsx integration/rpfjob001-postgres.ts
