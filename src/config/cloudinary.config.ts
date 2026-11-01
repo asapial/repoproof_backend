@@ -3,11 +3,15 @@ import status from "http-status";
 import AppError from "../errorHelpers/AppError";
 import { envVars } from "./env";
 
-cloudinary.config({
+if (envVars.CLOUDINARY) cloudinary.config({
     cloud_name: envVars.CLOUDINARY.CLOUDINARY_CLOUD_NAME,
     api_key: envVars.CLOUDINARY.CLOUDINARY_API_KEY,
     api_secret: envVars.CLOUDINARY.CLOUDINARY_API_SECRET,
 });
+
+function requireCloudinary(): void {
+    if (!envVars.CLOUDINARY) throw new AppError(status.SERVICE_UNAVAILABLE, "Cloudinary integration is disabled");
+}
 
 
 export const uploadFileToCloudinary = async (
@@ -16,6 +20,7 @@ export const uploadFileToCloudinary = async (
     subfolder?: string,
 ): Promise<UploadApiResponse> => {
 
+    requireCloudinary();
     if (!buffer || !fileName) {
         throw new AppError(status.BAD_REQUEST, "File buffer and file name are required for upload");
     }
@@ -64,7 +69,7 @@ export const uploadFileToCloudinary = async (
 
 
 export const deleteFileFromCloudinary = async (url: string) => {
-
+    if (!envVars.CLOUDINARY) return;
     try {
         const regex = /\/v\d+\/(.+?)(?:\.[a-zA-Z0-9]+)+$/;
 
@@ -90,4 +95,7 @@ export const deleteFileFromCloudinary = async (url: string) => {
 };
 
 
-export const cloudinaryUpload = cloudinary;
+// Prevent direct SDK access when the integration is disabled.
+export const cloudinaryUpload = new Proxy(cloudinary, {
+    get(target, property, receiver) { requireCloudinary(); return Reflect.get(target, property, receiver); },
+});

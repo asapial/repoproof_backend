@@ -8,5 +8,11 @@ import { prisma } from "./prisma";
 const security = securityConfig(envVars.FRONTEND_URL, envVars.NODE_ENV === "production", envVars.BETTER_AUTH_URL);
 export const auth = betterAuth({
     ...authSecurityOptions(security.allowedOrigin, envVars.NODE_ENV === "production"),
+    secret: envVars.BETTER_AUTH_SECRET,
+    baseURL: envVars.BETTER_AUTH_URL,
+    session: {
+        ...authSecurityOptions(security.allowedOrigin, envVars.NODE_ENV === "production").session,
+        ...envVars.SESSION,
+    },
     database: prismaAdapter(prisma, { provider: "postgresql" }),
 });

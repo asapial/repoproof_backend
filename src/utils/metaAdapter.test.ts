@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { z } from "zod";
 import { MetaAdapter } from "./metaAdapter";
 
@@ -8,6 +8,14 @@ const envelope = { id: "id", model: "muse-spark-1.3", choices: [{ finish_reason:
 const ok = () => new Response(JSON.stringify(envelope), { status: 200 });
 
 describe("MetaAdapter", () => {
+  beforeEach(() => vi.stubEnv("ENABLE_META", "true"));
+  afterEach(() => vi.unstubAllEnvs());
+  it("refuses provider calls while Meta is disabled even if a key exists", async () => {
+    vi.stubEnv("ENABLE_META", "false");
+    const transport = vi.fn();
+    await expect(new MetaAdapter(limits, "secret", undefined, transport).generate(request)).rejects.toMatchObject({ code: "NOT_CONFIGURED" });
+    expect(transport).not.toHaveBeenCalled();
+  });
   it("validates structured output and metadata", async () => {
     const transport = vi.fn().mockResolvedValue(ok());
     const result = await new MetaAdapter(limits, "secret", undefined, transport).generate(request);

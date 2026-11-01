@@ -160,6 +160,7 @@ function safeParseJson<T>(raw: string): T | null {
 export async function getAiResponse<T = unknown>(
   params: AiRequestParams
 ): Promise<AiResponse<T>> {
+  if (!envVars.OPENROUTER_ENABLED) throw new Error("OpenRouter integration is disabled");
   const {
     context,
     responseStyle,

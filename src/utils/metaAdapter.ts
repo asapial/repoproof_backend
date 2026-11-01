@@ -102,7 +102,7 @@ export class MetaAdapter {
   }
 
   async generate<T>(request: MetaRequest<T>): Promise<{ data: T; metadata: { id: string; model: string; latencyMs: number; usage?: { prompt_tokens: number; completion_tokens: number; total_tokens: number } } }> {
-    if (!this.apiKey?.trim()) throw new MetaError("NOT_CONFIGURED");
+    if (process.env.ENABLE_META !== "true" || !this.apiKey?.trim()) throw new MetaError("NOT_CONFIGURED");
     if (!z.object({ prompt: z.string().trim().min(1), schemaName: z.string().regex(/^[A-Za-z0-9_-]{1,64}$/), jsonSchema: z.object({ type: z.literal("object"), properties: z.record(z.string(), z.unknown()), required: z.array(z.string()), additionalProperties: z.literal(false) }).passthrough(), validator: z.instanceof(z.ZodType), reasoningEffort: z.enum(["minimal", "low", "medium", "high", "xhigh", "max"]).optional() }).safeParse(request).success || !/^[A-Za-z0-9._-]{1,128}$/.test(this.model)) throw new MetaError("INVALID_REQUEST");
     let body: string;
     try {

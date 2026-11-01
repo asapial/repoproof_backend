@@ -12,20 +12,20 @@ Status: **not approved or ready for deployment**. This is a provider-neutral pla
 
 ## Backend environment
 
-Supply values through the approved host secret manager; do not put real values in Git, shell history, screenshots or frontend configuration. These names are currently mandatory at startup, even when a feature is unused:
+RPF-STG-002 removes unused-provider credentials from core-only startup. Supply values through the host secret manager, never Git. `.env.example` contains names and safe defaults only.
 
-| Variable | Purpose |
+| Variables | Requirement |
 | --- | --- |
-| `NODE_ENV`, `PORT`, `DATABASE_URL` | Set `NODE_ENV=production`; host-assigned port and isolated staging PostgreSQL URL. |
-| `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `FRONTEND_URL` | Independent high-entropy staging session secret and the exact HTTPS origins. |
-| `ACCESS_TOKEN_SECRET`, `REFRESH_TOKEN_SECRET`, `ACCESS_TOKEN_EXPIRES_IN`, `REFRESH_TOKEN_EXPIRES_IN` | Independent staging token secrets and explicit lifetimes. |
-| `BETTER_AUTH_SESSION_TOKEN_EXPIRES_IN`, `BETTER_AUTH_SESSION_TOKEN_UPDATE_AGE` | Explicit session settings required by the current environment loader. Verify effective Better Auth configuration before relying on them. |
-| `EMAIL_SENDER_SMTP_USER`, `EMAIL_SENDER_SMTP_PASS`, `EMAIL_SENDER_SMTP_HOST`, `EMAIL_SENDER_SMTP_PORT`, `EMAIL_SENDER_SMTP_FROM` | Required by loader; actual usage must be reviewed and access bounded. |
-| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_CALLBACK_URL` | Required by loader; do not claim OAuth is verified. |
-| `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` | Required by loader; no upload behavior is verified. |
-| `OpenRouter_API_KEY` | Required by loader despite no model calls in this SAFE MVP flow. Do not use a fake credential for staging or enable paid access without approval. |
+| `NODE_ENV`, `PORT`, `DATABASE_URL` | Required runtime mode, valid TCP port and PostgreSQL URL with database name. |
+| `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `FRONTEND_URL` | Required session secret (at least 32 characters) and exact origins; production origins require HTTPS. |
+| `BETTER_AUTH_SESSION_TOKEN_EXPIRES_IN`, `BETTER_AUTH_SESSION_TOKEN_UPDATE_AGE` | Optional positive seconds, bounded to 30 days; defaults 604800/86400. Update age must be below expiry. Applied to Better Auth. |
+| `ENABLE_OPENROUTER`, `ENABLE_META` | Default false. True requires `OpenRouter_API_KEY` or `MODEL_API_KEY`. Paid/live model access still needs explicit authorization. |
+| `ENABLE_SMTP` | Default false. True requires all `EMAIL_SENDER_SMTP_USER/PASS/HOST/PORT/FROM` fields; port must be valid. No SAFE MVP mail endpoint is enabled. |
+| `ENABLE_GOOGLE_OAUTH` | Default false. True requires `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_CALLBACK_URL` (HTTPS in production). Provider registration/live OAuth remain separate and unverified. |
+| `ENABLE_CLOUDINARY` | Default false. True requires `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`. Disabled uploads/SDK access reject; disabled deletion is a no-op. |
+| `ENABLE_LEGACY_JWT` | Default false; SAFE MVP routes use Better Auth. True requires independent 32-character `ACCESS_TOKEN_SECRET`/`REFRESH_TOKEN_SECRET` and positive duration strings `ACCESS_TOKEN_EXPIRES_IN`/`REFRESH_TOKEN_EXPIRES_IN` with s/m/h/d units. Disabled token access throws. |
 
-The unnecessarily broad startup requirements are a staging blocker until the owner approves appropriately scoped staging values or the application is changed and retested to make unused integrations optional. Provisioning any credential or paid provider access requires separate authorization.
+Flags accept only literal `true` or `false`. Startup errors identify variable names without values. Configuring a dormant integration does not claim it is connected or authorize provider calls. Local PostgreSQL and production-mode bundle checks passed with synthetic test secrets and no provider keys. Real domains and provider credentials remain external checks.
 
 ## Build and migration procedure (proposal only)
 
