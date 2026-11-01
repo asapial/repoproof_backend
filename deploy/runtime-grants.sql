@@ -25,7 +25,7 @@ REVOKE CREATE ON SCHEMA public FROM :"runtime_role";
 GRANT CONNECT ON DATABASE :"approved_database" TO :"runtime_role";
 GRANT USAGE ON SCHEMA public TO :"runtime_role";
 GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE
-  public."user", public."session", public."account", public."verification", public."RequestDraft"
+  public."user", public."session", public."account", public."verification", public."RequestDraft", public."AuthRateBucket"
   TO :"runtime_role";
 ALTER ROLE :"runtime_role" SET statement_timeout = '5s';
 ALTER ROLE :"runtime_role" SET lock_timeout = '5s';

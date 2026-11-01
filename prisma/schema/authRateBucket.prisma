@@ -1,0 +1,8 @@
+// Shared, bounded auth throttling. Keys are HMACs, never raw IPs/emails.
+model AuthRateBucket {
+  key       String   @id @db.VarChar(64)
+  count     Int
+  expiresAt DateTime @db.Timestamptz(3)
+
+  @@index([expiresAt])
+}

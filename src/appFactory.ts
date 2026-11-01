@@ -2,6 +2,7 @@ import express, { type RequestHandler, type Router } from "express";
 import cookieParser from "cookie-parser";
 import { securityConfig } from "./config/security";
 import { assignV1RequestId, sendV1Error, v1ErrorHandler } from "./middleware/v1Errors";
+import { authRequestGuards } from "./middleware/authRequest";
 
 export function createApp(authHandler: RequestHandler, router: Router, frontendUrl: string, production: boolean, backendUrl?: string, options: { app?: ReturnType<typeof express>; checkReadiness?: () => Promise<unknown>; readinessTimeoutMs?: number } = {}) {
   const app = options.app ?? express();
@@ -10,7 +11,8 @@ export function createApp(authHandler: RequestHandler, router: Router, frontendU
   app.use("/api/v1", assignV1RequestId);
   app.use(security.originGuard);
   app.use(security.cors);
-  // Better Auth must receive the unconsumed request body.
+  // Pinned Better Call supports parsed JSON. Bound it before auth processing.
+  app.use("/api/auth", ...authRequestGuards(process.env.VERCEL === "1"));
   app.all('/api/auth/*splat', authHandler);
   app.use(cookieParser());
   app.use(express.json({ limit: "100kb" }));

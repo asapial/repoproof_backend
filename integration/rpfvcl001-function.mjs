@@ -21,7 +21,7 @@ try {
   const ready = await fetch(`${base}/readyz`); assert.equal(ready.status, 200); assert.deepEqual(await ready.json(), { status: "ready" });
   assert.equal((await fetch(`${base}/api/v1/request-draft`)).status, 401);
   const origin = process.env.FRONTEND_URL;
-  const signup = await fetch(`${base}/api/auth/sign-up/email`, { method: "POST", headers: { origin, "content-type": "application/json" }, body: JSON.stringify({ name: "Synthetic function", email: `function-${randomUUID()}@example.test`, password: "synthetic-password-123" }) });
+  const signup = await fetch(`${base}/api/auth/sign-up/email`, { method: "POST", headers: { origin, "content-type": "application/json", "x-vercel-forwarded-for": "192.0.2.10" }, body: JSON.stringify({ name: "Synthetic function", email: `function-${randomUUID()}@example.test`, password: "synthetic-password-123" }) });
   assert.equal(signup.status, 200);
   const cookie = signup.headers.getSetCookie().find(value => value.startsWith("__Secure-better-auth.session_token="));
   assert.ok(cookie); assert.match(cookie, /HttpOnly/i); assert.match(cookie, /Secure/i); assert.match(cookie, /SameSite=Lax/i); assert.doesNotMatch(cookie, /Domain=/i);

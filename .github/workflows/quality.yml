@@ -106,3 +106,4 @@ jobs:
           DIRECT_URL=postgresql://rpf_test@127.0.0.1:35440/rpf_db001_disposable npx --no-install prisma migrate deploy
           DIRECT_URL=postgresql://rpf_test@127.0.0.1:35440/rpf_db001_disposable npx --no-install prisma migrate status
           DATABASE_URL=postgresql://rpf_runtime_predeploy@127.0.0.1:35440/rpf012s_disposable RPF_TEST_ADMIN_DATABASE_URL=postgresql://rpf_test@127.0.0.1:35440/rpf012s_disposable RPF_LOCAL_DB_GATE=1 npx --no-install tsx integration/rpfdb001-runtime.ts
+          DATABASE_URL=postgresql://rpf_runtime_predeploy@127.0.0.1:35440/rpf012s_disposable RPF_LOCAL_DB_GATE=1 npx --no-install tsx integration/rpfsec006-security.ts

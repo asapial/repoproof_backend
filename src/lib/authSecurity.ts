@@ -12,6 +12,7 @@ export function authSecurityOptions(frontendOrigin: string, production: boolean,
       crossSubDomainCookies: { enabled: false },
       disableCSRFCheck: false,
       disableOriginCheck: false,
+      ipAddress: { ipAddressHeaders: ["x-repoproof-client-ip"], ipv6Subnet: 64 },
       defaultCookieAttributes: { sameSite: production && !sameOrigin ? "none" as const : "lax" as const, secure: production, httpOnly: true, path: "/" },
     },
   } satisfies Parameters<typeof betterAuth>[0];
