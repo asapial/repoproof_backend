@@ -93,3 +93,16 @@ jobs:
         run: |
           npm run build:function
           env -u PORT node integration/rpfvcl001-function.mjs
+      - name: Separate migration and limited runtime roles
+        working-directory: backend
+        env:
+          PGHOST: 127.0.0.1
+          PGPORT: '35440'
+          PGUSER: rpf_test
+          PGDATABASE: rpf012s_disposable
+        run: |
+          psql -v ON_ERROR_STOP=1 -f integration/rpfdb001-bootstrap.sql
+          psql -v approved_database=rpf012s_disposable -v runtime_role=rpf_runtime_predeploy -f deploy/runtime-grants.sql
+          DIRECT_URL=postgresql://rpf_test@127.0.0.1:35440/rpf_db001_disposable npx --no-install prisma migrate deploy
+          DIRECT_URL=postgresql://rpf_test@127.0.0.1:35440/rpf_db001_disposable npx --no-install prisma migrate status
+          DATABASE_URL=postgresql://rpf_runtime_predeploy@127.0.0.1:35440/rpf012s_disposable RPF_TEST_ADMIN_DATABASE_URL=postgresql://rpf_test@127.0.0.1:35440/rpf012s_disposable RPF_LOCAL_DB_GATE=1 npx --no-install tsx integration/rpfdb001-runtime.ts

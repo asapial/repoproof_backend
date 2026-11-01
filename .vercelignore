@@ -4,6 +4,7 @@
 .agents
 .env*
 docs
+deploy
 fixtures
 integration
 scripts
