@@ -51,4 +51,7 @@ Preserve the RPF-001C live-integration gap and runner-dependent prerequisites. A
 
 ## Approved workflow exception
 
+- RPF-STG-002 completed at `05a1f59957c56943172d590dc3f8237f0c94c780`, original `rpfstg002-worktree` / `feature/rpf-stg-002-core-config`.
+- RPF-SEC-005BE: this commit, `predeploy-backend` / `feature/rpf-sec-005be-toolchain`. ESLint and TypeScript ESLint updated with reviewed scoped minimatch overrides. 64 development package entries changed; no non-development package changed. 87 tests, lint/typecheck/build, clean install, positive/negative lint compatibility, contract parity and PostgreSQL auth/draft regression all passed. Full/production audits now zero. Evidence: local `output/predeployment-2026-11-01/evidence/sec005be-*`. Next: independent frontend RPF-SEC-005FE.
+
 For this SAFE MVP milestone the user approved sequential local dependency-ready tickets. Keep one reviewed local commit per completed ticket, all tests and security gates, preserved worktrees and no push/deploy/spending/infrastructure without separate authorization. Do not bypass dependencies, untrusted-code isolation, frozen tests or deterministic verdict policy.
