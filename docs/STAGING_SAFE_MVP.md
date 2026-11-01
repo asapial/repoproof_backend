@@ -1,5 +1,10 @@
 # SAFE MVP staging preparation (not deployed)
 
+Current target-specific preparation: [DEPLOYMENT_PACKAGE.md](DEPLOYMENT_PACKAGE.md),
+VERCEL_BACKEND.md, RELEASE_SECURITY.md and NEON_READINESS.md supersede this older
+provider-neutral Node/origin/cookie/runtime guidance. Historical checks below are
+not fresh release results. No deployment authorization has been granted.
+
 Status: **not approved or ready for deployment**. This is a provider-neutral plan. The local checks do not prove real TLS termination, DNS, host security, browser cookie behavior on the selected domains, deployed authorization, backups or rollback. No provider, infrastructure, spending, push or deployment has been approved. RPF-004 remains IN_PROGRESS; RPF-006A remains DEFERRED. No fixture execution or verdict is available.
 
 ## Release inputs and hosting requirements

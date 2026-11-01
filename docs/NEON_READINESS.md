@@ -1,5 +1,10 @@
 # Neon Free PostgreSQL preparation
 
+Current release also includes RPF-SEC-006's additive fourth migration,
+AuthRateBucket. Apply all four migrations before updated runtime-grants.sql.
+The three-migration backup/restore evidence below remains historical RPF-DB-001
+evidence, not a claim about the later schema. See DEPLOYMENT_PACKAGE.md.
+
 RPF-DB-001 is local preparation. No Neon account, project, branch, role,
 database, paid setting or network resource has been created or changed.
 

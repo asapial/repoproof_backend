@@ -70,6 +70,10 @@ warned that no trusted client IP header was supplied; distributed rate limiting
 and trusted Vercel/proxy IP handling remain the explicit security gate.
 
 Official references checked November 1, 2026:
+
+RPF-SEC-006 subsequently implemented shared PostgreSQL auth rate limits and
+trusted-IP middleware locally. See RELEASE_SECURITY.md; actual platform/proxy
+identity and HTTPS checks still need approved deployment.
 [Express](https://vercel.com/docs/frameworks/backend/express),
 [Node versions](https://vercel.com/docs/functions/runtimes/node-js/node-js-versions),
 [pool lifecycle](https://vercel.com/kb/guide/connection-pooling-with-functions),
