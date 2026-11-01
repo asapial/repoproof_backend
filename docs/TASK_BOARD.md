@@ -89,6 +89,8 @@ Status options: `TODO`, `IN_PROGRESS`, `BLOCKED`, `DONE`, `DEFERRED`. Edit one t
 
 ## Standard ticket closeout
 
+- **RPF-CI-001BE DONE (local preparation):** this commit adds a manual-only, pinned, read-only GitHub Actions definition, portable `npm run check`, candidate-plus-historical contract parity and six negative/portability checks. Node 24.22.2: 93 tests, lint, typecheck, build, full/production audits (zero), lint-toolchain checks passed. Local migrations/status/repeat deploy, repeated own-user draft tests, auth and actual bundle smoke passed. YAML/security validation passed. No remote workflow published/activated/run; published cross-repo SHAs and approval remain required. See `docs/CI.md`.
+
 - **RPF-HYG-002 DONE (documentation only):** inspected all five stale D: registrations and their existing I: directories via explicit read-only Git paths. Recorded exact HEADs and preserved the dirty fixture in `.rpf-002-patched-f56bcb6`. `docs/WORKTREE_REPAIR_PLAN.md` documents approval, backup, identity and post-repair checks. No repair/prune/delete/move or fixture execution occurred. Documentation diff checks passed.
 
 - Actual repository, branch and commit SHA(s)

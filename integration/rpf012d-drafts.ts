@@ -9,12 +9,16 @@ const { default: app } = await import("../src/app");
 const { requestDraftResponseSchema } = await import("../src/contracts/requestDraft");
 const origin = "http://localhost:3000";
 const server = app.listen(0, "127.0.0.1");
+const createdUsers: string[] = [];
+const draftCount = () => prisma.requestDraft.count({ where: { userId: { in: createdUsers } } });
 await new Promise<void>((resolve, reject) => { server.once("listening", resolve); server.once("error", reject); });
 try {
   const base = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
   const signup = async () => {
     const response = await fetch(`${base}/api/auth/sign-up/email`, { method: "POST", headers: { origin, "content-type": "application/json" }, body: JSON.stringify({ name: "Synthetic", email: `draft-${randomUUID()}@example.test`, password: "synthetic-password-123" }) });
     assert.equal(response.status, 200);
+    const body = await response.json();
+    assert.equal(typeof body.user.id, "string"); createdUsers.push(body.user.id);
     const cookie = response.headers.getSetCookie().find(c => c.startsWith("better-auth.session_token="));
     assert.ok(cookie); return cookie.split(";")[0]!;
   };
@@ -33,23 +37,27 @@ try {
   assert.deepEqual(requestDraftResponseSchema.parse(await (await get(b)).json()), { draft: null });
   assert.deepEqual(requestDraftResponseSchema.parse(await (await get(a)).json()), { draft });
   assert.equal((await put(a, draft)).status, 200);
-  assert.equal(await prisma.requestDraft.count(), 1);
+  assert.equal(await draftCount(), 1);
   assert.equal((await put(b, draft)).status, 200);
-  assert.equal(await prisma.requestDraft.count(), 2);
+  assert.equal(await draftCount(), 2);
   const deleted = await fetch(endpoint, { method: "DELETE", headers: { cookie: a, origin } });
   assert.equal(deleted.status, 200);
   assert.deepEqual(requestDraftResponseSchema.parse(await deleted.json()), { draft: null });
   assert.deepEqual(requestDraftResponseSchema.parse(await (await get(a)).json()), { draft: null });
   assert.deepEqual(requestDraftResponseSchema.parse(await (await get(b)).json()), { draft });
-  const remaining = await prisma.requestDraft.findFirstOrThrow();
-  const unused = await prisma.user.findFirstOrThrow({ where: { requestDraft: null }, select: { id: true } });
+  const remaining = await prisma.requestDraft.findUniqueOrThrow({ where: { userId: createdUsers[1]! } });
+  const unused = { id: createdUsers[0]! };
   await assert.rejects(prisma.$executeRaw`INSERT INTO "RequestDraft" ("userId", "repositoryId", "fixtureKey", "issueNumber") VALUES (${unused.id}, ${"../escape"}, ${"discount-bug"}, ${1})`);
   await assert.rejects(prisma.$executeRaw`INSERT INTO "RequestDraft" ("userId", "repositoryId", "fixtureKey", "issueNumber") VALUES (${unused.id}, ${"repoproof-backend"}, ${"discount-bug"}, ${0})`);
   await assert.rejects(prisma.$executeRaw`INSERT INTO "RequestDraft" ("userId", "repositoryId", "fixtureKey", "issueNumber") VALUES (${"missing-user"}, ${"repoproof-backend"}, ${"discount-bug"}, ${1})`);
-  assert.equal(await prisma.requestDraft.count(), 1);
+  assert.equal(await draftCount(), 1);
   await prisma.user.delete({ where: { id: remaining.userId } });
-  assert.equal(await prisma.requestDraft.count(), 0);
+  assert.equal(await draftCount(), 0);
   const counts = await Promise.all([prisma.run.count(), prisma.issueSnapshot.count(), prisma.runApproval.count(), prisma.runEvent.count(), prisma.verificationReport.count()]);
   assert.deepEqual(counts, [0, 0, 0, 0, 0]);
   console.log("PASS: two-user PostgreSQL draft isolation, CSRF, invalid inputs, allowlist, idempotent save/delete, database constraints/cascade and zero run/evidence records");
-} finally { await new Promise<void>((resolve, reject) => server.close(error => error ? reject(error) : resolve())); await prisma.$disconnect(); }
+} finally {
+  await new Promise<void>((resolve, reject) => server.close(error => error ? reject(error) : resolve()));
+  try { await prisma.user.deleteMany({ where: { id: { in: createdUsers } } }); }
+  finally { await prisma.$disconnect(); }
+}

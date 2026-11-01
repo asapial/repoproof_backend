@@ -1,0 +1,86 @@
+name: Backend quality
+
+# Prepared locally only. Publishing or running remotely needs approval.
+on:
+  workflow_dispatch:
+    inputs:
+      frontend_ref:
+        description: Approved published frontend full commit SHA
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: backend-quality-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:16-alpine@sha256:0cefaabd882e42bcb2a2f3dc56d3ce4770560ba62fd7f197f1a2e008fd5731ab
+        env:
+          POSTGRES_USER: rpf_test
+          POSTGRES_DB: rpf012s_disposable
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 35440:5432
+        options: >-
+          --health-cmd "pg_isready -U rpf_test -d rpf012s_disposable"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      NODE_ENV: test
+      PORT: '15441'
+      DATABASE_URL: postgresql://rpf_test@127.0.0.1:35440/rpf012s_disposable
+      BETTER_AUTH_SECRET: synthetic-ci-only-session-secret-0123456789
+      BETTER_AUTH_URL: http://localhost:3001
+      FRONTEND_URL: http://localhost:3000
+      RPF_STAGE_SMOKE: '1'
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          path: backend
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '24.x'
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - name: Validate frontend pin
+        env:
+          FRONTEND_REF: ${{ inputs.frontend_ref }}
+        run: node -e "if (!/^[0-9a-f]{40}$/.test(process.env.FRONTEND_REF ?? '')) process.exit(1)"
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          repository: asapial/repoproof_frontend
+          ref: ${{ inputs.frontend_ref }}
+          path: frontend
+          persist-credentials: false
+      - name: Install without lifecycle scripts
+        working-directory: backend
+        run: npm ci --ignore-scripts
+      - name: Unit, lint, types, build and audits
+        working-directory: backend
+        run: npm run check
+      - name: Contract compatibility
+        working-directory: backend
+        env:
+          REPOPROOF_FRONTEND: ${{ github.workspace }}/frontend
+        run: node scripts/check-contracts.mjs
+      - name: Fresh disposable migrations
+        working-directory: backend
+        run: |
+          npx --no-install prisma migrate deploy
+          npx --no-install prisma migrate status
+          npx --no-install prisma migrate deploy
+      - name: Two-user authorization and authentication
+        working-directory: backend
+        run: |
+          npx --no-install tsx integration/rpf012d-drafts.ts
+          npx --no-install tsx integration/rpf012s-db.ts
+          node integration/rpfstg001-production.mjs
