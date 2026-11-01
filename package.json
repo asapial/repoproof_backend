@@ -45,6 +45,7 @@
     "@prisma/adapter-pg": "7.10.1",
     "@prisma/client": "7.10.1",
     "@vercel/functions": "3.10.5",
+    "@vercel/sandbox": "3.9.1",
     "better-auth": "1.7.14",
     "cloudinary": "^2.10.0",
     "cookie-parser": "^1.4.7",
