@@ -12,7 +12,7 @@ const eventSchema = z.discriminatedUnion("type", [
   z.object({ type: z.literal("END"), seq: sequence }).strict(),
 ]);
 export type ReporterEvent = z.infer<typeof eventSchema>;
-const reportPlanSchema = z.object({ version: z.literal("rpf-reporter-v1"), plan: executionPlanSchema,
+export const reportPlanSchema = z.object({ version: z.literal("rpf-reporter-v1"), plan: executionPlanSchema,
   assertionsPerTest: z.array(z.number().int().min(1).max(32)).min(1).max(16) }).strict()
   .refine(value => value.assertionsPerTest.length === value.plan.expectedTests &&
     value.assertionsPerTest.reduce((sum, n) => sum+n, 0) === value.plan.expectedAssertions);
