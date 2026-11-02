@@ -35,6 +35,11 @@ exists. See DURABLE_REPLAY.md and DURABLE_JOBS.md for their actual limits.
 
 ## Eligible independent local components
 
+RPF-ISO-002 adds pinned hard-memory/two-worker CPU probe packets and conservative
+observation consistency checks. Source was only hashed/parsed; actual pressure,
+provider/cgroup enforcement and independent cleanup evidence remain live gates.
+See HARD_RESOURCE_PROBES.md.
+
 RPF-GUEST-001 adds fresh fixed-path, descriptor-anchored no-follow snapshot
 preparation and independent byte readback. Successful filesystem tests are modeled;
 the actual Windows deny path and standalone bundle were checked. Approved Linux

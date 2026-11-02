@@ -1,5 +1,9 @@
 # Independent negative isolation harness — RPF-ISO-001
 
+RPF-ISO-002 separately prepares [hard-resource negative probes](HARD_RESOURCE_PROBES.md).
+Their assets are pinned but never host/Docker executed; synthetic observation
+checks cannot satisfy RESOURCES or change RPF-004's incomplete status.
+
 RPF-GUEST-001 prepares a separate [owned guest filesystem helper](GUEST_PREPARATION.md).
 Its modeled tests and real Windows deny path do not satisfy FILESYSTEM or any
 other real isolation gate below. No probe assets or frozen fixture bytes changed.
