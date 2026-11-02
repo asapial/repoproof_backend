@@ -35,6 +35,11 @@ exists. See DURABLE_REPLAY.md and DURABLE_JOBS.md for their actual limits.
 
 ## Eligible independent local components
 
+RPF-STAGE-001 adds an append-only multi-stage preparation journal with durable
+freeze metadata, fail/regression/patch ordering, NO_REPRO termination and conservative
+quarantine/cancel/expiry recovery. It stores references, not authenticated execution
+facts, and does not activate the live worker. See DURABLE_STAGE_JOURNAL.md.
+
 RPF-META-002 now adds immutable attempt/usage accounting bound to quarantined
 META effects. Missing usage stays unknown; a late observation or reread cannot
 grant dispatch or release quarantine. It deliberately does not implement the

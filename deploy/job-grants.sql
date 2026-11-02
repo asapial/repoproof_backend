@@ -9,6 +9,8 @@ SELECT EXISTS (SELECT 1 FROM pg_roles r WHERE r.rolname=:'worker_role'
   AND NOT pg_has_role(r.oid,current_user,'MEMBER')
   AND NOT pg_has_role(r.oid,'pg_read_all_data','MEMBER') AND NOT pg_has_role(r.oid,'pg_write_all_data','MEMBER')
   AND NOT has_table_privilege(r.oid,'public."user"','SELECT')
+  AND (to_regclass('public."ExecutionStageJournal"') IS NULL
+    OR NOT has_table_privilege(r.oid,to_regclass('public."ExecutionStageJournal"'),'INSERT'))
   AND NOT has_table_privilege(r.oid,'public."Run"','SELECT')
   AND NOT has_table_privilege(r.oid,'public."ExecutionReplayGroup"','SELECT')
   AND (to_regclass('public."MetaAttemptAccounting"') IS NULL

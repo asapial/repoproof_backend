@@ -1,5 +1,9 @@
 # Durable control-plane jobs — RPF-JOB-001
 
+RPF-STAGE-001 adds a separate [durable preparation journal](DURABLE_STAGE_JOURNAL.md)
+for ordered references and restart recovery. It grants no provider permission,
+successful verdict or quarantine release and leaves this job/effect foundation intact.
+
 This is a PostgreSQL foundation, not the live RPF-011B orchestrator. It creates
 no product Run/report, public endpoint, provider permission, verdict, cloud
 resource or background task. RPF-004 remains IN_PROGRESS and RPF-006A remains
