@@ -34,12 +34,13 @@ All browser clients send credentials and no-store and never store session tokens
 | --- | --- | --- |
 | POST /sign-up/email | Enabled; {name,email,password}; creates own account/session | SafeMvp registration; actual SQL/browser/security tests. |
 | POST /sign-in/email | Enabled; {email,password}; own account/session | SafeMvp sign-in; wrong-password/throttle/session tests. |
-| GET or POST /get-session | Current session or null | SafeMvp session loader; actual SQL/browser and recovery cases. |
+| GET /get-session | Current authoritative DB session or null; legacy cache cleared | SafeMvp loader; real SQL/browser/recovery/revocation. POST requires deferSessionRefresh and is not enabled. |
 | POST /sign-out | Current session | SafeMvp sign-out; actual SQL/browser. |
-| POST /update-user | Native current-user name/image update | No UI consumer; not independently product-tested yet. |
-| POST /change-password | Native authenticated current-password change | No UI consumer; not independently product-tested yet. |
+| POST /update-user | Native current-user name/image update | No UI yet; revoked signed-cache denial proven in real SQL; successful profile UI remains pending. |
+| POST /change-password | Native authenticated current-password change | No UI yet; real restricted-role SQL verifies wrong-password denial, replacement password and other-device revocation. |
 | GET /list-sessions | Native own sessions | No UI consumer; not independently product-tested yet. |
-| POST /revoke-session, /revoke-sessions, /revoke-other-sessions | Native own-session revocation | No UI consumer; product tests needed, including cookie-cache behavior. |
+| POST /revoke-session, /revoke-other-sessions | Native own-session revocation | No UI yet; real SQL verifies other-device revocation, cross-user denial, stale-cache replay and current/unrelated-user controls. |
+| POST /revoke-sessions | Native all-own-session revocation | No UI; separate product acceptance remains pending. |
 | POST /verify-password, /update-session | Framework native guards/options | No product consumer; do not present as completed product functionality. |
 | GET /list-accounts, /account-info | Framework native own-account guards | No product consumer; no public tokens returned by an app-owned wrapper. |
 | POST /sign-in/social, /link-social, /unlink-account, /get-access-token, /refresh-token; GET or POST /callback/:id | Framework routes present; no socialProviders configured | Google env validation alone does not enable OAuth. No connected-provider claim or UI. |
@@ -50,6 +51,9 @@ All browser clients send credentials and no-store and never store session tokens
 The framework entries above are an installed-code inventory, not claims that
 every conditional route works or was live tested. Account UI tickets must inspect
 the exact request/response/guards and test the configured behavior before use.
+RPF-SEC-007 disables session cookie caching globally; PostgreSQL revocation and
+server expiry apply on every lookup, including cookies issued by the older
+five-minute cache policy. The wire contracts and valid sessions remain compatible.
 
 ## Target paths still unimplemented
 

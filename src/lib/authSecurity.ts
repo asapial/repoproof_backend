@@ -5,7 +5,9 @@ export function authSecurityOptions(frontendOrigin: string, production: boolean,
   return {
     trustedOrigins: [frontendOrigin],
     emailAndPassword: { enabled: true },
-    session: { cookieCache: { enabled: true, maxAge: 5 * 60 } },
+    // PostgreSQL is authoritative on every request. Signed cookies from older
+    // releases must not survive server-side revocation or expiry for five minutes.
+    session: { cookieCache: { enabled: false } },
     advanced: {
       cookiePrefix: "better-auth",
       useSecureCookies: production,

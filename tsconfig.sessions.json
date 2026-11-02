@@ -1,0 +1,6 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": { "noEmit": true, "types": ["node"] },
+  "include": ["integration/rpfsec007-revocation.ts"],
+  "exclude": ["node_modules", "prisma/generated"]
+}

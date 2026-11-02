@@ -38,12 +38,12 @@ NOT_APPLICABLE records explicitly later/conditional product scope.
 
 | Requirement | State | Backend / persistence | Actual frontend | Tests / security / integration evidence and remaining work |
 | --- | --- | --- | --- | --- |
-| Public landing and scope disclosure | PARTIAL | No API required | Only / renders SafeMvp landing plus auth/catalog card | Historical real browser/mobile evidence exists. Dedicated app navigation and required pages are missing. |
+| Public landing and scope disclosure | PARTIAL | No API required | / and /runs/new now share real Home/New verification navigation | Fresh real browser and desktop/tablet/mobile screenshots pass. Remaining app pages are still missing. Primary old e9a4a6e checkout renders only a title and two paragraphs; do not confuse it with the candidate. |
 | Registration, email sign-in, session, logout | COMPLETE (local core) | Better Auth + PostgreSQL user/session/account; shared throttling, CSRF/origin and HttpOnly cookies | Working same-page forms | Historical real PostgreSQL/proxy browser tests. Fresh product validation and deployed HTTPS remain required. |
 | Account/profile and session management | PARTIAL | Native Better Auth update-user/change-password/session APIs exist; account deletion/email change are not enabled | No account/settings view | Add real consumers, negative auth/origin/session tests and browser recovery. No new parallel auth system. |
 | Google authentication when enabled | MISSING | Environment validates GOOGLE_* but auth has no socialProviders registration | No provider button | Local wiring/disabled state can be implemented. Actual callback origins and interactive provider verification remain external. |
-| FR-01 / F-01 approved repository selection | PARTIAL | Authenticated curated /repositories and request-draft persist | One approved repo/issue identifier, no title/body/pin inspection | Real catalog/draft integration exists. Add authorized issue preview and frontend consumer; no arbitrary repos. |
-| GitHub issue/source validation | PARTIAL | OwnedGitHubIntake pins commit/tree/blob bytes; RPF-012I now registers bounded authenticated issue/commit preview | No issue inspector yet | Fresh live metadata GETs pass through local auth/SQL and exported Function. Full source intake remains separately gated and unregistered; preview grants no source/execution authority. |
+| FR-01 / F-01 approved repository selection | PARTIAL | Authenticated curated catalog/draft and owned live issue preview persist/read | /runs/new inspects actual title/body/commit, refreshes/cancels and saves draft | Fresh real PostgreSQL/proxy/browser/GitHub metadata proof. No arbitrary repos; run creation/snapshot persistence remains gated. |
+| GitHub issue/source validation | PARTIAL | OwnedGitHubIntake pins commit/tree/blob bytes; RPF-012I registers bounded authenticated issue/commit preview | RPF-013I consumes real issue/pin with safe plain-text rendering | Live metadata checks pass through local auth/SQL/Function/browser. Full source intake remains separately gated and unregistered; preview grants no source/execution authority. |
 | Saved request drafts | COMPLETE (local scope) | One per authenticated owner; strict schemas/constraints | Save/restore/delete work | Historical real two-user PostgreSQL and browser checks; no run or evidence rows are created. |
 | FR-02 / F-02 issue triage | BLOCKED | Typed Meta ANALYZE task exists; no production triage lifecycle | No plan view | RPF-006A explicitly DEFERRED. Do not implement/resume it through a renamed ticket. |
 | FR-08 / F-03 human approval | PARTIAL | Target DTO/schema exists; no live create/approve route or approval orchestration | No approval page | Full parent prerequisites remain. Never queue execution from UI or model output. |
@@ -91,18 +91,32 @@ NOT_APPLICABLE records explicitly later/conditional product scope.
   integration types/lint/live Function passed. Next: frontend RPF-013I.
 - Earlier engine work remains in existing history and checkpoint evidence.
   Its DONE labels describe preparation only; none completes a blocked parent.
+- RPF-013I frontend: **06f1c5b448ab9a37fce75d15cdd6db3048622bb5**,
+  feature/rpf-013i-issue-workflow. Board-only backend tracking:
+  **3d5f3e4eac7934a5f8e3f12e55f72b97d07903d1**. Seventeen focused/49 full
+  frontend tests, five-file contract checks, lint/types/build/clean install and
+  zero audits passed. Real restricted-PostgreSQL proxy browser + four public
+  metadata GETs, four viewports/keyboard/draft/quota/logout and separate fault
+  cases passed. Desktop/320 px screenshots reviewed; product evidence rows zero.
+- RPF-SEC-007: this commit. Disable signed session caching so PostgreSQL
+  revocation/expiry applies immediately, including legacy cookies. Three frozen
+  baseline assertion failures now pass unchanged. Fourteen focused/738 full
+  tests, complete quality/Function/integration gates and real restricted-role
+  PostgreSQL revocation/password/user-isolation checks pass; source and Function
+  paths. Browser regression passes; zero external/fixture/Meta/Sandbox calls.
+  See SESSION_REVOCATION.md and immutable sec007-* command/hash evidence.
 
 ## Current integration/status ledger
 
 | Area | Actual status |
 | --- | --- |
-| Frontend | f9519df preview; functional auth/catalog/draft; missing main page set. |
+| Frontend | 06f1c5b / feature/rpf-013i-issue-workflow, descendant of f9519df; functional auth/catalog/draft/live issue inspector. Other main pages remain missing. Original .gitignore edit preserved. |
 | Backend | Engine branch includes release baseline, offline foundations, reporter and live read-only issue preview; execution remains unavailable. |
 | Database | Owned local PostgreSQL rpf-predeploy-20261101 is live. New rpf_product_disposable has ten migrations and a limited rpf_product_runtime role; other databases/immutable synthetic evidence preserved. No cloud validation. |
 | Configuration | MODEL_API_KEY, Neon DATABASE_URL and optional Google credentials exist by name. Active files lack BETTER_AUTH_SECRET, BETTER_AUTH_URL and FRONTEND_URL. Never print/copy secret values into evidence. |
 | Meta | Live no-charge entitlement not established; default denial remains. |
 | Sandbox/security | Zero new live calls/VMs; RPF-004 unverified; independent observer and real isolation acceptance missing. |
-| Real E2E | Historical SAFE preview browser/API/SQL checks only; full issue-to-verdict product E2E missing. |
+| Real E2E | Fresh production proxy/browser, local restricted SQL and live public issue metadata pass. Session-revocation security and synthetic UI fault gates pass. Full issue-to-verdict provider/runner E2E remains missing. |
 | Deployment | Local package exists, no deploy/provisioning/push/merge authorized. Credentials do not configure Vercel projects automatically. |
 
 ## Dependency-ready sequence and blockers
@@ -111,13 +125,17 @@ NOT_APPLICABLE records explicitly later/conditional product scope.
    RPF-001C-BE and RPF-INTAKE-002. Authenticate, pin/validate input, bound GitHub
    GETs/deadlines/global rate, exclude PRs and return safe documented DTOs. This
    grants no run creation, triage, approval, execution or verdict authority.
-2. RPF-013I (current next): frontend issue-selection/inspection route consuming that actual API;
+2. RPF-013I (completed locally): frontend issue-selection/inspection route consuming that actual API;
    preserve current auth/drafts and unavailable execution. Separate frontend
    code and backend tracking commits, actual browser/API/database verification.
-3. Independently split owner-scoped read-only history from execution creation;
+3. RPF-ACC-001FE (current next): account/profile/password and revoke-other-session
+   controls using the actual native authenticated endpoints, after RPF-SEC-007.
+   Verify real own-user behavior, safe errors, confirmation of session changes,
+   expiry and responsive keyboard/browser flows. No destructive account deletion.
+4. Independently split owner-scoped read-only history from execution creation;
    add account/session/settings/navigation using actual authorized records.
    Keep parent run/report prerequisites and missing live evidence explicit.
-4. Resume the exact next eligible implementation after each reviewed commit;
+5. Resume the exact next eligible implementation after each reviewed commit;
    update this ledger, API inventory and canonical board with real evidence.
 
 External decisions to consolidate when the concrete local candidates are ready:
