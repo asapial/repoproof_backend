@@ -11,6 +11,7 @@ export const githubFixturePolicy = Object.freeze({ repository: "asapial/repoproo
   blobs: Object.freeze({ "src/discount.mjs": "dc273c1d9e967465bc2a3df894f1a0b21736e1e2",
     "tests/issue.mjs": "88a111206f45d05541c1999c8339343e9b6c97fb", "tests/regression.mjs": "f3756fba8c5f6b104a7c11a86847b2f4356731cd" }) });
 const gitSha = z.string().regex(/^[a-f0-9]{40}$/);
+const commitSchema = z.object({ sha: z.literal(fixturePin), tree: z.object({ sha: z.literal(githubFixturePolicy.tree) }) });
 const treeSchema = z.object({ sha: z.literal(githubFixturePolicy.tree), truncated: z.literal(false), tree: z.array(z.object({
   path: z.string().min(1).max(512), mode: z.enum(["100644", "100755", "040000", "120000", "160000"]),
   type: z.enum(["blob", "tree", "commit"]), sha: gitSha, size: z.number().int().nonnegative().safe().optional(),
@@ -42,6 +43,24 @@ export class OwnedGitHubIntake {
     this.#transport = transport;
   }
   toJSON() { return { source: "owned-pinned-github-intake", credentials: false }; }
+  /** Display-only issue preview. Does not admit source bytes or mint a snapshot handle. */
+  async preview(externalSignal?: AbortSignal) {
+    const controller = new AbortController(), cancel = () => controller.abort();
+    if (externalSignal?.aborted) throw new GitHubIntakeError("CANCELLED");
+    externalSignal?.addEventListener("abort", cancel, { once: true });
+    const deadline = performance.now() + this.timeoutMs, timer = setTimeout(() => controller.abort(), this.timeoutMs);
+    try {
+      commitSchema.parse(await this.#json(api + "/git/commits/" + fixturePin, 32768, controller.signal, deadline));
+      const issue = issueSchema.parse(await this.#json(api + "/issues/1", 131072, controller.signal, deadline));
+      controller.signal.throwIfAborted();
+      if (performance.now() >= deadline) throw new GitHubIntakeError("TIMEOUT");
+      return { baseSha: fixturePin, issue: { number: issue.number, title: issue.title, body: issue.body, url: issue.html_url } };
+    } catch (error) {
+      if (externalSignal?.aborted) throw new GitHubIntakeError("CANCELLED");
+      if (controller.signal.aborted) throw new GitHubIntakeError("TIMEOUT");
+      throw error instanceof GitHubIntakeError ? error : new GitHubIntakeError("INVALID_RESPONSE");
+    } finally { clearTimeout(timer); controller.abort(); externalSignal?.removeEventListener("abort", cancel); }
+  }
   async #json(url: string, limit: number, signal: AbortSignal, deadline: number): Promise<unknown> {
     const check = () => { signal.throwIfAborted(); if (performance.now() >= deadline) throw new GitHubIntakeError("TIMEOUT"); };
     check();
@@ -84,8 +103,7 @@ export class OwnedGitHubIntake {
     externalSignal?.addEventListener("abort", cancel, { once: true });
     const deadline = performance.now() + this.timeoutMs, timer = setTimeout(() => controller.abort(), this.timeoutMs);
     try {
-      const commit = z.object({ sha: z.literal(fixturePin), tree: z.object({ sha: z.literal(githubFixturePolicy.tree) }) })
-        .parse(await this.#json(api + "/git/commits/" + fixturePin, 32768, controller.signal, deadline));
+      const commit = commitSchema.parse(await this.#json(api + "/git/commits/" + fixturePin, 32768, controller.signal, deadline));
       if (commit.sha !== fixturePin) throw new GitHubIntakeError("INTEGRITY");
       const tree = treeSchema.parse(await this.#json(api + "/git/trees/" + githubFixturePolicy.tree + "?recursive=1", 524288, controller.signal, deadline));
       if (new Set(tree.tree.map(entry => entry.path)).size !== tree.tree.length || tree.tree.some(entry => !safePath(entry.path))) throw new GitHubIntakeError("INTEGRITY");

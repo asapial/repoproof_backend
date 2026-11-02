@@ -1,0 +1,261 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "RepoProof owned issue preview",
+    "version": "1.0.0",
+    "description": "Shipped read-only issue endpoint only. Does not expose execution, triage, reports, privileged controls or arbitrary repositories. The complete observed surface is in API_INVENTORY.md."
+  },
+  "paths": {
+    "/api/v1/repositories/{id}/issues": {
+      "get": {
+        "operationId": "getOwnedIssuePreview",
+        "summary": "Read the approved GitHub issue and pinned commit",
+        "security": [
+          {
+            "SessionCookie": []
+          },
+          {
+            "DevelopmentSessionCookie": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "const": "repoproof-backend"
+            }
+          }
+        ],
+        "description": "No query parameters. No-store. Two fixed credential-free GitHub GETs with one five-second upstream deadline. Shared PostgreSQL limits admit two previews per owner and five globally per 900 seconds. PRs and altered commit/issue identities fail closed. Creates no run or execution permission.",
+        "responses": {
+          "200": {
+            "description": "Validated public metadata; untrusted issue text remains data",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IssuePreview"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Unsupported query parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Session required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Origin denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Repository not allowed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Preview quota unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "schema": {
+                  "type": "string",
+                  "const": "900"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal failure without sensitive details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "GitHub metadata unavailable, malformed, mismatched, PR or timeout",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "SessionCookie": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "__Secure-better-auth.session_token",
+        "description": "Secure HttpOnly production cookie; browser manages it."
+      },
+      "DevelopmentSessionCookie": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "better-auth.session_token",
+        "description": "Loopback development HTTP only."
+      }
+    },
+    "schemas": {
+      "IssuePreview": {
+        "type": "object",
+        "properties": {
+          "repositoryId": {
+            "type": "string",
+            "const": "repoproof-backend"
+          },
+          "repository": {
+            "type": "string",
+            "const": "asapial/repoproof_backend"
+          },
+          "fixtureKey": {
+            "type": "string",
+            "const": "discount-bug"
+          },
+          "baseSha": {
+            "type": "string",
+            "const": "1066351c5b07bed024775a16af9151048a9316b2"
+          },
+          "source": {
+            "type": "string",
+            "const": "GITHUB_API"
+          },
+          "fetchedAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+          },
+          "issues": {
+            "minItems": 1,
+            "maxItems": 1,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "number": {
+                  "type": "number",
+                  "const": 1
+                },
+                "title": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 500
+                },
+                "body": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 16000
+                },
+                "url": {
+                  "type": "string",
+                  "const": "https://github.com/asapial/repoproof_backend/issues/1"
+                }
+              },
+              "required": [
+                "number",
+                "title",
+                "body",
+                "url"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "repositoryId",
+          "repository",
+          "fixtureKey",
+          "baseSha",
+          "source",
+          "fetchedAt",
+          "issues"
+        ],
+        "additionalProperties": false
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "pattern": "^[A-Z][A-Z0-9_]*$"
+              },
+              "message": {
+                "type": "string",
+                "minLength": 1
+              },
+              "requestId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^[A-Za-z0-9_-]+$"
+              }
+            },
+            "required": [
+              "code",
+              "message",
+              "requestId"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "error"
+        ],
+        "additionalProperties": false
+      }
+    }
+  }
+}

@@ -14,6 +14,7 @@ guest helpers are unregistered; do not document or expose them as public APIs.
 | GET /healthz | none / {status:ok} | Public | no-store; liveness only; health.test.ts. |
 | GET /readyz | none / {status:ready or unavailable} | Public | Bounded DB probe, 503 on timeout/failure; no-store; health.test.ts. |
 | GET /api/v1/repositories | none / safeFixtureCatalogSchema | Session; public curated allowlist | 401/500; no-store; SafeMvp catalog(); router.test.ts and historical real SQL/browser. |
+| GET /api/v1/repositories/repoproof-backend/issues | no query / issuePreviewSchema | Session; only owned approved repository/issue; pinned commit/tree | 400/401/403/404/429/503/500; PostgreSQL owner/global limits; two bounded GitHub GETs; no-store. RPF-012I real local auth/SQL and live public GitHub metadata passed, including exported Function bundle and limited-role checks. Frontend consumer pending RPF-013I. |
 | GET /api/v1/request-draft | none / requestDraftResponseSchema | Session owner resolved server-side | 401/500; no-store; SafeMvp draft(); drafts.test.ts and real two-user SQL/browser. |
 | PUT /api/v1/request-draft | requestDraftSchema / requestDraftResponseSchema | Session owner, approved exact fixture; CSRF Origin | 400/401/403/404/500; one saved draft per user; SafeMvp saveDraft(); SQL constraints and owner tests. |
 | DELETE /api/v1/request-draft | no body / {draft:null} | Session owner; CSRF Origin | 401/403/500; idempotent; SafeMvp deleteDraft(); two-user SQL/browser. |
@@ -53,7 +54,7 @@ the exact request/response/guards and test the configured behavior before use.
 ## Target paths still unimplemented
 
 GET /api/v1/health (existing health paths above differ),
-GET /api/v1/repositories/:id/issues, GET /api/v1/runs,
+GET /api/v1/runs,
 GET /api/v1/runs/:id, POST /api/v1/runs/:id/approve,
 POST /api/v1/runs/:id/cancel, GET /api/v1/runs/:id/events,
 GET /api/v1/runs/:id/report, GET /api/v1/runs/:id/report.md,
@@ -65,3 +66,5 @@ ownership/error/rate tests and a separately verified frontend consumer. Run,
 report and artifact APIs retain their original trust/runner dependencies.
 OpenAPI should describe shipped supported surfaces without exposing privileged
 runner controls, secrets, private storage keys or falsely implemented paths.
+The shipped issue preview is described in issue-preview.openapi.json (OpenAPI
+3.1, one operation; schemas exported from the actual strict Zod contracts).

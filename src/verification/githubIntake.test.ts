@@ -29,6 +29,29 @@ async function fixture() {
   return { owned, manifest, commit, tree, blobs, issue, bodies, transport, client: new OwnedGitHubIntake(transport) };
 }
 describe("pinned read-only GitHub transport — synthetic HTTP only", () => {
+  it("previews only the pinned commit and owned issue without admitting source bytes", async () => {
+    const h = await fixture(), result = await h.client.preview();
+    expect(result).toEqual({ baseSha: fixturePin, issue: { number: 1, title: h.issue.title, body: h.issue.body, url: h.issue.html_url } });
+    expect(h.transport.mock.calls.map(([url]) => String(url))).toEqual([api+"/git/commits/"+fixturePin,api+"/issues/1"]);
+    expect(() => readOwnedSnapshot(result as never)).toThrow("INVALID_HANDLE");
+  });
+  it.each(["commit", "issue", "pullRequest"])("refuses changed %s in display-only preview", async changed => {
+    const h = await fixture();
+    if (changed === "commit") h.commit.sha = "0".repeat(40) as typeof fixturePin;
+    if (changed === "issue") h.issue.number = 2;
+    if (changed === "pullRequest") Object.assign(h.issue,{ pull_request: {} });
+    await expect(h.client.preview()).rejects.toMatchObject({ code: "INVALID_RESPONSE" });
+    expect(h.transport.mock.calls.length).toBeLessThanOrEqual(2);
+  });
+  it("bounds preview deadlines and preserves cancellation without exposing upstream errors", async () => {
+    const h = await fixture(), stopped = new AbortController(); stopped.abort();
+    await expect(h.client.preview(stopped.signal)).rejects.toMatchObject({ code: "CANCELLED" }); expect(h.transport).not.toHaveBeenCalled();
+    const pending = new OwnedGitHubIntake(vi.fn(() => new Promise<Response>(() => {})),10);
+    await expect(pending.preview()).rejects.toMatchObject({ code: "TIMEOUT" });
+    const cancelled = new AbortController(), request = new OwnedGitHubIntake(vi.fn(() => new Promise<Response>(() => {}))).preview(cancelled.signal);
+    cancelled.abort(); await expect(request).rejects.toMatchObject({ code: "CANCELLED" });
+    await expect(new OwnedGitHubIntake(vi.fn(async () => { throw new Error("SENSITIVE"); })).preview()).rejects.toMatchObject({ code: "UNAVAILABLE", message: "UNAVAILABLE" });
+  });
   it("binds commit/tree/modes/Git blob hashes/SHA-256 before immutable intake without following response URLs", async () => {
     const h = await fixture(), snapshot = await h.client.load(h.manifest);
     expect(snapshot.networkVerified).toBe(false);
