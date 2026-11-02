@@ -6,6 +6,10 @@
 
 Status options: `TODO`, `IN_PROGRESS`, `BLOCKED`, `DONE`, `DEFERRED`. Edit one ticket at a time and keep previous evidence.
 
+## Full-product continuation — November 2, 2026
+
+- **RPF-ACC-001FE DONE (depends on RPF-SEC-007):** frontend 10395a358b625ba5dc9dcf9b4ecdff3c6a0caf82, predeploy-frontend / feature/rpf-acc-001-account-settings. Reuses preserved account work: /settings edits the current profile, changes password with other-session revocation and explicitly confirms signing out other sessions. Authoritative pre/post-session checks, safe fixed errors, credential/token exclusion and private-state clearing preserve ownership. Fresh Node24 69 tests (10 files), all five pinned/current contracts, lint/types/build, clean lockfile install, toolchain and zero full/production audits pass. Actual production same-origin proxy/browser with restricted-role PostgreSQL verifies profile persistence, password replacement/new login, multiple devices, unrelated-user isolation, expiry recovery, actual auth cooldown and 1280/768/390/320 px. Existing draft/expiry/deadline/issue/account fault regressions pass. Desktop/320 px screenshots visually reviewed. Independent Run/report/artifact counts remain 0/0/0. Original .gitignore edit preserved unstaged. Evidence: output/full-product-2026-11-02/evidence/account-* and artifacts/account-browser-regression. This backend commit tracks only the frontend code SHA. No provider/fixture calls or full-product completion claim; RPF-004 IN_PROGRESS, RPF-006A DEFERRED.
+
 ## Setup and foundation (two-repo replacement for old RPF-001)
 
 | Ticket | Repo | Status | Depends | Acceptance evidence / meaning | Code SHA / checks |
