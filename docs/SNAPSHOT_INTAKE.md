@@ -31,9 +31,11 @@ The provider's existing DATA_ONLY envelope remains responsible for presenting
 that text as data, while deterministic downstream policies enforce constraints.
 Text content never changes source allowlists, command selection or permission.
 
-No network fetch, repository scripts, Git checkout, archive extraction or source
-evaluation occurs. This ticket does not authenticate a future GitHub transport,
-fetch arbitrary issues or enable run APIs. Real read-only transport, HTTP
-authorization, independent runner provenance and durable snapshot storage are
-separate integrations. RPF-012A/006B remain TODO, RPF-004 IN_PROGRESS and RPF-006A
+This static intake performs no network fetch, repository scripts, Git checkout,
+archive extraction or source evaluation. RPF-INTAKE-002 now supplies a separate
+fixed read-only GitHub client with exact tree/blob pins and bounded responses;
+see GITHUB_PINNED_INTAKE.md. RPF-FREEZE-002 persists exact frozen preparation
+packages. Neither component authenticates run APIs or independent runner facts.
+Live transport validation, HTTP authorization and actual workflow integration
+remain separate gates. RPF-012A/006B remain TODO, RPF-004 IN_PROGRESS and RPF-006A
 DEFERRED. Unit tests use exact local bytes as data and adversarial input objects.
