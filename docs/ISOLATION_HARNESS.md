@@ -1,5 +1,9 @@
 # Independent negative isolation harness — RPF-ISO-001
 
+RPF-GUEST-001 prepares a separate [owned guest filesystem helper](GUEST_PREPARATION.md).
+Its modeled tests and real Windows deny path do not satisfy FILESYSTEM or any
+other real isolation gate below. No probe assets or frozen fixture bytes changed.
+
 Offline preparation only. RPF-004 remains IN_PROGRESS. No owned probe has been
 executed on the host, Docker Desktop or a cloud provider. Tests read/hash and
 syntax-parse fixture bytes, never import/run them. Meta inference, cloud execution,

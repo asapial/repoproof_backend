@@ -35,6 +35,11 @@ exists. See DURABLE_REPLAY.md and DURABLE_JOBS.md for their actual limits.
 
 ## Eligible independent local components
 
+RPF-GUEST-001 adds fresh fixed-path, descriptor-anchored no-follow snapshot
+preparation and independent byte readback. Successful filesystem tests are modeled;
+the actual Windows deny path and standalone bundle were checked. Approved Linux
+image/kernel/race/mount/disposal gates remain mandatory. See GUEST_PREPARATION.md.
+
 RPF-STAGE-001 adds an append-only multi-stage preparation journal with durable
 freeze metadata, fail/regression/patch ordering, NO_REPRO termination and conservative
 quarantine/cancel/expiry recovery. It stores references, not authenticated execution
