@@ -1,5 +1,10 @@
 # Structured execution-result protocol — RPF-RESULT-001
 
+RPF-REPORTER-001 adds the independent [owned event protocol](OWNED_REPORTER_PROTOCOL.md)
+and bounded collector. It requires explicit assertion events and external process/
+artifact observations; it never infers counts from test success or authenticates
+guest output. Actual guest counter/reporter wiring remains separate.
+
 Version `rpf-result-v1` defines a bounded typed receipt for an eventual owned
 reporter/controller. No reporter executes tests in this ticket. Decoder inputs
 are inert bytes; stdout, model output and guest claims do not become trusted
