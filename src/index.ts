@@ -9,6 +9,8 @@ import { issuePreviewLimiter } from "./safeMvp/issueRate";
 import { authRateStorage } from "./lib/authRateLimit";
 import { envVars } from "./config/env";
 import { OwnedGitHubIntake } from "./verification/githubIntake";
+import { createRunHistoryRouter, historyLimiter } from "./safeMvp/history";
+import { postgresHistoryStore } from "./safeMvp/historyStore";
 
 const userIdFor = async (req: Parameters<Parameters<typeof createDraftRouter>[0]>[0]) => {
   const session = await auth.api.getSession({ headers: fromNodeHeaders(req.headers) });
@@ -16,6 +18,7 @@ const userIdFor = async (req: Parameters<Parameters<typeof createDraftRouter>[0]
 };
 export const indexRouter = Router();
 indexRouter.use(createSafeMvpRouter(async req => Boolean(await userIdFor(req))));
+indexRouter.use(createRunHistoryRouter(userIdFor, postgresHistoryStore(prisma), historyLimiter(authRateStorage(prisma, envVars.BETTER_AUTH_SECRET))));
 const ownedGitHub = new OwnedGitHubIntake(fetch);
 indexRouter.use(createIssuePreviewRouter(userIdFor, {
   allow: issuePreviewLimiter(authRateStorage(prisma, envVars.BETTER_AUTH_SECRET)),

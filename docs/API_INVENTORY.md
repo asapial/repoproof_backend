@@ -14,6 +14,7 @@ guest helpers are unregistered; do not document or expose them as public APIs.
 | GET /healthz | none / {status:ok} | Public | no-store; liveness only; health.test.ts. |
 | GET /readyz | none / {status:ready or unavailable} | Public | Bounded DB probe, 503 on timeout/failure; no-store; health.test.ts. |
 | GET /api/v1/repositories | none / safeFixtureCatalogSchema | Session; public curated allowlist | 401/500; no-store; SafeMvp catalog(); router.test.ts and historical real SQL/browser. |
+| GET /api/v1/runs | strict limit/cursor / runHistoryResponseSchema | Session-resolved owner and fixed approved fixture/pin; null/other owners excluded | 400/401/429/503/500; no-store; shared owner/global PostgreSQL quota; narrow SQL projection. Real limited-role source/Function, two-user, pagination/privilege and synthetic-record checks pass. Frontend dashboard/history consumer is the next ticket; stored states are not verdicts. |
 | GET /api/v1/repositories/repoproof-backend/issues | no query / issuePreviewSchema | Session; only owned approved repository/issue; pinned commit/tree | 400/401/403/404/429/503/500; PostgreSQL owner/global limits; two bounded GitHub GETs; no-store. RPF-012I real local auth/SQL and live public GitHub metadata passed, including exported Function bundle and limited-role checks. Frontend consumer pending RPF-013I. |
 | GET /api/v1/request-draft | none / requestDraftResponseSchema | Session owner resolved server-side | 401/500; no-store; SafeMvp draft(); drafts.test.ts and real two-user SQL/browser. |
 | PUT /api/v1/request-draft | requestDraftSchema / requestDraftResponseSchema | Session owner, approved exact fixture; CSRF Origin | 400/401/403/404/500; one saved draft per user; SafeMvp saveDraft(); SQL constraints and owner tests. |
@@ -36,10 +37,10 @@ All browser clients send credentials and no-store and never store session tokens
 | POST /sign-in/email | Enabled; {email,password}; own account/session | SafeMvp sign-in; wrong-password/throttle/session tests. |
 | GET /get-session | Current authoritative DB session or null; legacy cache cleared | SafeMvp loader; real SQL/browser/recovery/revocation. POST requires deferSessionRefresh and is not enabled. |
 | POST /sign-out | Current session | SafeMvp sign-out; actual SQL/browser. |
-| POST /update-user | Native current-user name/image update | No UI yet; revoked signed-cache denial proven in real SQL; successful profile UI remains pending. |
-| POST /change-password | Native authenticated current-password change | No UI yet; real restricted-role SQL verifies wrong-password denial, replacement password and other-device revocation. |
+| POST /update-user | Native current-user name/image update | /settings edits name only and confirms the authoritative account; real PostgreSQL/proxy browser persistence and revoked-cache denial pass. |
+| POST /change-password | Native authenticated current-password change | /settings requires current password and revokes other sessions; real PostgreSQL/proxy browser verifies replacement login, denial and expiry recovery. |
 | GET /list-sessions | Native own sessions | No UI consumer; not independently product-tested yet. |
-| POST /revoke-session, /revoke-other-sessions | Native own-session revocation | No UI yet; real SQL verifies other-device revocation, cross-user denial, stale-cache replay and current/unrelated-user controls. |
+| POST /revoke-session, /revoke-other-sessions | Native own-session revocation | /settings explicitly confirms revoke-other-sessions; real SQL/browser verifies other-device revocation, cross-user denial, stale-cache replay and current/unrelated-user controls. Individual-device UI remains absent. |
 | POST /revoke-sessions | Native all-own-session revocation | No UI; separate product acceptance remains pending. |
 | POST /verify-password, /update-session | Framework native guards/options | No product consumer; do not present as completed product functionality. |
 | GET /list-accounts, /account-info | Framework native own-account guards | No product consumer; no public tokens returned by an app-owned wrapper. |
@@ -58,7 +59,6 @@ five-minute cache policy. The wire contracts and valid sessions remain compatibl
 ## Target paths still unimplemented
 
 GET /api/v1/health (existing health paths above differ),
-GET /api/v1/runs,
 GET /api/v1/runs/:id, POST /api/v1/runs/:id/approve,
 POST /api/v1/runs/:id/cancel, GET /api/v1/runs/:id/events,
 GET /api/v1/runs/:id/report, GET /api/v1/runs/:id/report.md,
@@ -68,7 +68,9 @@ Existing v1 schemas for creation/plan/events/report are proposed wire contracts,
 not a running backend. Every new route needs exact validation, authentication,
 ownership/error/rate tests and a separately verified frontend consumer. Run,
 report and artifact APIs retain their original trust/runner dependencies.
-OpenAPI should describe shipped supported surfaces without exposing privileged
+OpenAPI describes shipped supported surfaces without exposing privileged
 runner controls, secrets, private storage keys or falsely implemented paths.
 The shipped issue preview is described in issue-preview.openapi.json (OpenAPI
 3.1, one operation; schemas exported from the actual strict Zod contracts).
+run-history.openapi.json separately describes the shipped GET history operation
+and its strict response/error schemas. No execution or report operation is added.

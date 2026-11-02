@@ -1,5 +1,42 @@
 # Full-product completion ledger
 
+## Resumed full-product mission — November 2, 2026
+
+The current goal authorizes sequential reviewed local feature commits and a
+hard $0 cash limit. Bounded Meta/Sandbox smoke tests are conditional on verified
+actual free entitlement/quota and the stated harmless scope. No paid fallback,
+upgrade, billing activation, deployment, push, production write or arbitrary
+repository execution is authorized. RPF-006A remains DEFERRED; RPF-004 remains
+IN_PROGRESS. The earlier starting-state and evidence sections below are history.
+
+- Reporter recovery was already committed at 3170d85; implementation was reused.
+  Fresh lockfile npm ci restored missing Babel dependencies without a source or
+  lockfile change. Node24 68 reporter tests, real numeric pass/fail tests, three
+  standalone bundle hash checks, instrumentation types and the current 738-test
+  full engine/normal/Function quality gates pass with zero audits. Trusted
+  numeric self-tests are not fixture execution or authenticated runner evidence.
+- Release session-revocation port: 92bbb426dc3abe23ebb1708c54cf4e361b431f7a,
+  predeploy-backend / feature/rpf-sec-007-release. Three frozen baseline failures,
+  138 full tests and real restricted-role source/Function checks pass. Original
+  release branch at 17042919 remains intact; the actual cooldown was honored.
+- Existing account frontend reused and committed: 10395a358b625ba5dc9dcf9b4ecdff3c6a0caf82;
+  separate backend tracking f871c46dfda4a90747a5dfd8a939717c370ab887. Fresh 69
+  frontend tests, quality gates and actual production proxy/SQL browser plus
+  responsive/visual review pass. Original .gitignore edit remains preserved.
+- New candidates: full-product-backend / feature/full-product-backend starts at
+  the tested engine descendant of the original release base; full-product-frontend
+  / feature/full-product-frontend starts at the account commit. No branches were
+  merged or overwritten. Contracts still pin 397d84d until the next consumer.
+- RPF-HISTORY-001BE: this commit adds actual owner-scoped stored history/counts.
+  Node24 23 focused/761 full tests and all local quality/Function/migration gates
+  pass. Real source/Function SQL tests use a separate synthetic-record database;
+  no real execution or verdict is inferred. See OWNED_RUN_HISTORY.md. Dashboard
+  and premium SVG identity/UI are the next independent frontend ticket.
+
+The append-only local ledger, exact starting dirty hashes and command evidence
+live in output/full-product-2026-11-02. Preserve all historical checkpoints and
+manifests. Full-product status remains PARTIALLY_COMPLETE_WITH_BLOCKERS.
+
 ## Scope and authoritative starting state — November 2, 2026
 
 Objective: complete the integrated RepoProof product described by the existing

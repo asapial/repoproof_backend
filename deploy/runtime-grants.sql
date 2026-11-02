@@ -27,6 +27,8 @@ GRANT USAGE ON SCHEMA public TO :"runtime_role";
 GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE
   public."user", public."session", public."account", public."verification", public."RequestDraft", public."AuthRateBucket"
   TO :"runtime_role";
+-- Safe history metadata only. Raw run/evidence tables remain inaccessible.
+GRANT EXECUTE ON FUNCTION public.repoproof_history_v1(text, timestamptz, text, integer) TO :"runtime_role";
 ALTER ROLE :"runtime_role" SET statement_timeout = '5s';
 ALTER ROLE :"runtime_role" SET lock_timeout = '5s';
 ALTER ROLE :"runtime_role" SET idle_in_transaction_session_timeout = '10s';
