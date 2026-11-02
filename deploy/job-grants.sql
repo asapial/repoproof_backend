@@ -11,6 +11,8 @@ SELECT EXISTS (SELECT 1 FROM pg_roles r WHERE r.rolname=:'worker_role'
   AND NOT has_table_privilege(r.oid,'public."user"','SELECT')
   AND NOT has_table_privilege(r.oid,'public."Run"','SELECT')
   AND NOT has_table_privilege(r.oid,'public."ExecutionReplayGroup"','SELECT')
+  AND (to_regclass('public."MetaAttemptAccounting"') IS NULL
+    OR NOT has_table_privilege(r.oid,to_regclass('public."MetaAttemptAccounting"'),'INSERT'))
   AND (to_regclass('public."ExecutionReconciliation"') IS NULL
     OR NOT has_table_privilege(r.oid,to_regclass('public."ExecutionReconciliation"'),'INSERT'))
   AND NOT EXISTS(SELECT 1 FROM pg_auth_members m WHERE m.member=r.oid)

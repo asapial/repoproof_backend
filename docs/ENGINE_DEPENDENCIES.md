@@ -35,6 +35,11 @@ exists. See DURABLE_REPLAY.md and DURABLE_JOBS.md for their actual limits.
 
 ## Eligible independent local components
 
+RPF-META-002 now adds immutable attempt/usage accounting bound to quarantined
+META effects. Missing usage stays unknown; a late observation or reread cannot
+grant dispatch or release quarantine. It deliberately does not implement the
+positive no-charge reservation controller. See META_ACCOUNTING.md.
+
 Keep each separately scoped, tested and committed, with honest parent status:
 
 - Durable multi-stage orchestration, quota/zero-charge entitlement and usage

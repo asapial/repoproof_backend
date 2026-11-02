@@ -12,6 +12,8 @@ SELECT EXISTS (SELECT 1 FROM pg_roles r WHERE r.rolname=:'observer_role'
   AND NOT has_table_privilege(r.oid,'public."user"','SELECT')
   AND NOT has_table_privilege(r.oid,'public."Run"','SELECT')
   AND NOT has_table_privilege(r.oid,'public."ExecutionReplayGroup"','SELECT')
+  AND (to_regclass('public."MetaAttemptAccounting"') IS NULL
+    OR NOT has_table_privilege(r.oid,to_regclass('public."MetaAttemptAccounting"'),'INSERT'))
   AND NOT has_table_privilege(r.oid,'public."ExecutionJob"','UPDATE')
   AND NOT has_table_privilege(r.oid,'public."ExecutionEffect"','INSERT')
   AND NOT EXISTS(SELECT 1 FROM pg_class c WHERE c.relowner=r.oid AND c.relnamespace='public'::regnamespace

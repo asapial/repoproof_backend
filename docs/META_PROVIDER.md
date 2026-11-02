@@ -90,6 +90,11 @@ of a genuine entitlement that cannot create a charge; otherwise inference stays 
 
 ## Offline verification
 
+RPF-META-002 adds a standalone [durable accounting store](META_ACCOUNTING.md) for
+existing quarantined META effects, including unknown usage and lost-ack recovery.
+It provides no positive reservation or provider-enforced no-charge entitlement;
+the default deny gate and live authorization requirements above remain in force.
+
 Vitest uses injected transports/permissions only. Tests cover catalog selection,
 missing models/credentials/approval, request and byte bounds, prompt-injection
 fields, source hashes, protected paths, post-await mutation, typed analysis/test/
