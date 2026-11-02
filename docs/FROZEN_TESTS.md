@@ -26,13 +26,14 @@ bytes to the expected snapshot, including source, and rejects extra, duplicate,
 missing, aliased or modified files. These checks must run on independently
 collected artifacts in a future trusted execution controller.
 
-This is an immutable in-process preparation capability, not durable artifact
-storage, a guest no-follow writer, a provenance attestation or an execution
-verdict. Process restart deliberately loses capability; a future authenticated
-durable store must independently validate persisted manifest/bytes and enforce
-freeze-before-patch event order. A file hash alone cannot prove that order.
-Real runner containment, provider operations and freeze persistence remain
-unavailable. RPF-006B remains TODO; RPF-004 IN_PROGRESS; RPF-006A DEFERRED.
+This module is an immutable in-process preparation capability. The separate
+RPF-FREEZE-002 store now validates and persists canonical exact-byte packages,
+restores private capabilities after acknowledged reads, and gates proposal calls
+on a durable freeze; see FROZEN_PACKAGES.md. Neither module is a guest no-follow
+writer, provenance attestation or execution verdict. A file hash alone cannot
+prove a full workflow's event order. Real runner containment, provider operations,
+authenticated run ownership and live orchestration remain unavailable.
+RPF-006B remains TODO; RPF-004 IN_PROGRESS; RPF-006A DEFERRED.
 
 Unit tests read fixture bytes as data and use inert synthetic patch/test bytes.
 They cover mutation, counterfeit handles, path and protected-file bypasses,
