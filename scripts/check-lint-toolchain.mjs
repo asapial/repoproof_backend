@@ -16,6 +16,9 @@ for (const consumer of ["eslint", "@eslint/config-array", "@typescript-eslint/ty
 }
 const eslint = new ESLint();
 assert.equal(await eslint.isPathIgnored("prisma/generated/prisma/client.ts"), true);
+assert.equal(await eslint.isPathIgnored("function-build/app.js"), true);
+assert.equal(await eslint.isPathIgnored("function-build/nested/entry.js"), true);
+assert.equal(await eslint.isPathIgnored("src/function-build/app.ts"), false);
 const [good] = await eslint.lintText("export const n: number = 1;\n", { filePath: "src/toolchain-probe.ts" });
 assert.equal(good.errorCount, 0);
 const [bad] = await eslint.lintText("const unused: number = 1;\n", { filePath: "src/toolchain-probe.ts" });

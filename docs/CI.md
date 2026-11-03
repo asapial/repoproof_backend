@@ -62,3 +62,25 @@ YAML parsing and checks for manual triggers, pinned actions, read-only token
 permissions and credential-free checkout passed. GitHub execution remains
 pending publication and explicit approval. Local evidence: parent
 `output/predeployment-2026-11-01/evidence/ci001be-*`.
+
+## Function output and lint ordering (RPF-TEST-007BE)
+
+The normal `api/` and Prisma generated outputs were excluded from lint, but
+`build:function`'s root `function-build/` directory was not. Running the full
+quality gate after a successful Function build therefore linted bundled vendor
+code and reported 28 unused-variable errors. The generated artifact and failing
+run are retained; no source warning was suppressed.
+
+The global ignore now includes only `function-build/**`. The lint-toolchain
+probe checks its direct and nested output paths, confirms that the same name
+under `src/` is still checked, and retains the actual positive/unused-variable
+TypeScript checks. Exact probe bytes were frozen before the config patch,
+failed on the old config, and passed unchanged after the fix. Frozen SHA-256:
+`e09240dbcdb0e1003049830ba4fe4b673396a9161047533a1a71386927a78c83`.
+
+Fresh Node 24.22.2 clean install, actual Function build followed by the full
+quality gate, 780 tests in 56 files, lint/types/normal build/toolchain and both
+zero-finding audits pass in a tracked-source-only copy. Sandbox preparation is
+preserved separately and excluded from this ticket. App source, dependencies,
+contracts and emitted Function bytes are unchanged. Evidence:
+`output/full-product-2026-11-02/evidence/lint-function-output-*`.
