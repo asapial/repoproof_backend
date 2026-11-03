@@ -13,7 +13,11 @@ guest helpers are unregistered; do not document or expose them as public APIs.
 | GET / | none / service status, environment, uptime/time | Public | Legacy status, not versioned business data; no frontend dependency. |
 | GET /healthz | none / {status:ok} | Public | no-store; liveness only; health.test.ts. |
 | GET /readyz | none / {status:ready or unavailable} | Public | Bounded DB probe, 503 on timeout/failure; no-store; health.test.ts. |
-| GET /api/v1/auth-capabilities | no query / authCapabilitiesSchema | Public configuration only; no account lookup | no-store, 400 for query; configured password-reset availability only, not delivery proof. Real SQL/source/Function and unit checks; frontend recovery consumer next. |
+| GET /api/v1/auth-capabilities | no query / authCapabilitiesSchema | Public configuration only; no account lookup | no-store, 400 for query; configured password-reset availability only, not delivery proof. Real SQL/source/Function and actual /forgot-password and /reset-password consumers. |
+| GET /api/v1/email-verification | no query / emailVerificationCapabilitySchema | Public configuration only | Separate optional flag; recovery capability response unchanged. no-store; 400/503 safe envelope. |
+| GET /api/v1/email-verification/account | no query / emailVerificationAccountSchema | Authoritative current session; no selected owner | Own email/verified/enabled only; shared user/global reads; 400/401/429/503. Real restricted SQL/source/Function proof. |
+| POST /api/v1/email-verification/request | strict empty JSON / {status:true}, 202 | Current session recipient only; exact frontend Origin | Bounded trusted-IP body guard; delivery 3/user/15min and 30 global/min; request IP/global quotas; no caller email/callback. Already verified is idempotent. 400/401/403/408/413/415/429/503. |
+| POST /api/v1/email-verification/confirm | strict JSON token / {status:true} | Anonymous purpose-bound native capability; exact frontend Origin | HS256/payload/purpose/15-minute TTL before native emailVerified write. Idempotent until expiry; no login/email/password change or public user fields. Bounded body, shared IP/global quotas; invalid 400 versus infrastructure 503. Local TLS/source/Function and cross-user proof; frontend is next. |
 | GET /api/v1/repositories | none / safeFixtureCatalogSchema | Session; public curated allowlist | 401/500; no-store; SafeMvp catalog(); router.test.ts and historical real SQL/browser. |
 | GET /api/v1/runs | strict limit/cursor / runHistoryResponseSchema | Session-resolved owner and fixed approved fixture/pin; null/other owners excluded | 400/401/429/503/500; no-store; shared owner/global PostgreSQL quota; narrow SQL projection. Real limited-role source/Function, two-user, pagination/privilege and synthetic-record checks pass. Frontend /dashboard and /history consume actual stored records/counts; stored states are not verdicts. |
 | GET /api/v1/repositories/repoproof-backend/issues | no query / issuePreviewSchema | Session; only owned approved repository/issue; pinned commit/tree | 400/401/403/404/429/503/500; PostgreSQL owner/global limits; two bounded GitHub GETs; no-store. RPF-012I real local auth/SQL and live public GitHub metadata passed, including exported Function bundle and limited-role checks. RPF-013I /runs/new consumes real preview data with browser/API proof. |
@@ -46,10 +50,10 @@ All browser clients send credentials and no-store and never store session tokens
 | POST /verify-password, /update-session | Framework native guards/options | No product consumer; do not present as completed product functionality. |
 | GET /list-accounts, /account-info | Framework native own-account guards | No product consumer; no public tokens returned by an app-owned wrapper. |
 | POST /sign-in/social, /link-social, /unlink-account, /get-access-token, /refresh-token; GET or POST /callback/:id | Framework routes present; no socialProviders configured | Google env validation alone does not enable OAuth. No connected-provider claim or UI. |
-| POST /request-password-reset | Enabled only with explicit SMTP configuration; generic existing/unknown acknowledgement | Shared native-IP/address/global SQL quotas, 15-minute hashed token, fixed fragment link and async TLS delivery. Real source/Function restricted-PostgreSQL/TLS sink checks pass; frontend consumer next. |
-| POST /reset-password | Explicit SMTP required; token/newPassword in JSON, no query | Atomic one-time token, all-device revocation and credential write; safe rollback/concurrency/expiry tested. No auto-session. Frontend consumer next. |
+| POST /request-password-reset | Enabled only with explicit SMTP configuration; generic existing/unknown acknowledgement | Shared native-IP/address/global SQL quotas, 15-minute hashed token, fixed fragment link and async TLS delivery. /forgot-password consumes the actual API; real production-proxy/restricted-PostgreSQL/TLS browser proof passes. |
+| POST /reset-password | Explicit SMTP required; token/newPassword in JSON, no query | Atomic one-time token, all-device revocation and credential write; safe rollback/concurrency/expiry tested. /reset-password actual mail-link browser/new-login/replay/expiry proof passes. No auto-session. |
 | GET /reset-password/:token | App intentionally rejects native URL-token callback; fragment link goes directly to the frontend | No supported consumer. Mail never contains a native token path or API query token. |
-| POST /send-verification-email; GET /verify-email | Verification callbacks/options remain unconfigured | No email-verification product claim. |
+| POST /send-verification-email; GET /verify-email | Native HTTP paths explicitly disabled; trusted server API used behind v1 wrappers | Optional ENABLE_EMAIL_VERIFICATION with approved SMTP; native signup callback issues scoped fragment mail. No raw query-token or anonymous-resend frontend consumer. |
 | POST /change-email, /delete-user; GET /delete-user/callback | Require explicitly enabled features and framework freshness/verification | Not enabled; no destructive account control advertised. |
 | GET /ok, /error | Native framework health/error | No frontend dependency; not application readiness or provider evidence. |
 
@@ -80,4 +84,9 @@ run-history.openapi.json separately describes the shipped GET history operation
 and its strict response/error schemas. No execution or report operation is added.
 auth-recovery.openapi.json describes the public capability and two native reset
 operations. PASSWORD_RECOVERY.md records local TLS/SQL proof, default disabled
-configuration, delivery boundaries and the pending separate frontend consumer.
+configuration and external delivery boundaries.
+The completed recovery consumer is frontend 389f03067053b992791aa40d8e7f937433b331fa;
+its seven contract files remain compatible with this backend. The independent
+email-verification.openapi.json adds four scoped operations; EMAIL_VERIFICATION.md
+records native authority, purpose/lifetime/idempotency, quotas and local TLS/SQL
+evidence. Email verification frontend and external delivery remain separate.

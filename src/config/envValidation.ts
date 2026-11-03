@@ -55,6 +55,8 @@ export function parseEnvironment(input: Environment) {
   const sessionUpdateAge = seconds(input, "BETTER_AUTH_SESSION_TOKEN_UPDATE_AGE", "86400");
   if (sessionUpdateAge >= sessionExpiresIn) throw new Error("BETTER_AUTH_SESSION_TOKEN_UPDATE_AGE must be less than BETTER_AUTH_SESSION_TOKEN_EXPIRES_IN");
   const smtpEnabled = enabled(input, "ENABLE_SMTP");
+  const emailVerificationEnabled = enabled(input, "ENABLE_EMAIL_VERIFICATION");
+  if (emailVerificationEnabled && !smtpEnabled) throw new Error("ENABLE_EMAIL_VERIFICATION requires ENABLE_SMTP");
   const googleEnabled = enabled(input, "ENABLE_GOOGLE_OAUTH");
   const cloudEnabled = enabled(input, "ENABLE_CLOUDINARY");
   const openrouterEnabled = enabled(input, "ENABLE_OPENROUTER");
@@ -81,7 +83,7 @@ export function parseEnvironment(input: Environment) {
     BETTER_AUTH_SECRET: secret(input, "BETTER_AUTH_SECRET"),
     SESSION: { expiresIn: sessionExpiresIn, updateAge: sessionUpdateAge },
     BETTER_AUTH_URL: origin(input, "BETTER_AUTH_URL", production), FRONTEND_URL: origin(input, "FRONTEND_URL", production),
-    EMAIL_SENDER: smtp, GOOGLE: google, CLOUDINARY: cloudinary, OPENROUTER_ENABLED: openrouterEnabled,
+    EMAIL_SENDER: smtp, EMAIL_VERIFICATION_ENABLED: emailVerificationEnabled, GOOGLE: google, CLOUDINARY: cloudinary, OPENROUTER_ENABLED: openrouterEnabled,
     get OpenRouter_API_KEY() { if (!openrouter) throw new Error("OpenRouter integration is disabled"); return openrouter; },
     get ACCESS_TOKEN_SECRET() { return getLegacy().accessSecret; },
     get REFRESH_TOKEN_SECRET() { return getLegacy().refreshSecret; },

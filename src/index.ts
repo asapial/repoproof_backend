@@ -12,6 +12,9 @@ import { OwnedGitHubIntake } from "./verification/githubIntake";
 import { createRunHistoryRouter, historyLimiter } from "./safeMvp/history";
 import { postgresHistoryStore } from "./safeMvp/historyStore";
 import { createAuthCapabilitiesRouter } from "./safeMvp/authCapabilities";
+import { createEmailVerificationRouter, emailVerificationLimiter } from "./safeMvp/emailVerification";
+import { validateVerificationToken } from "./lib/emailVerificationToken";
+import { isAPIError } from "better-auth/api";
 
 const userIdFor = async (req: Parameters<Parameters<typeof createDraftRouter>[0]>[0]) => {
   const session = await auth.api.getSession({ headers: fromNodeHeaders(req.headers) });
@@ -19,6 +22,20 @@ const userIdFor = async (req: Parameters<Parameters<typeof createDraftRouter>[0]
 };
 export const indexRouter = Router();
 indexRouter.use(createAuthCapabilitiesRouter(Boolean(envVars.EMAIL_SENDER)));
+indexRouter.use(createEmailVerificationRouter({
+  enabled: envVars.EMAIL_VERIFICATION_ENABLED, frontendOrigin: envVars.FRONTEND_URL,
+  userFor: async req => {
+    const session = await auth.api.getSession({ headers: fromNodeHeaders(req.headers) });
+    return session?.user ? { id: session.user.id, email: session.user.email, emailVerified: session.user.emailVerified } : null;
+  },
+  allow: emailVerificationLimiter(authRateStorage(prisma, envVars.BETTER_AUTH_SECRET)),
+  request: async (user, req) => { await auth.api.sendVerificationEmail({ headers: fromNodeHeaders(req.headers), body: { email: user.email } }); },
+  confirm: async token => {
+    try { validateVerificationToken(token, envVars.BETTER_AUTH_SECRET); } catch { return false; }
+    try { const result = await auth.api.verifyEmail({ query: { token } }); if (result?.status !== true) throw new Error("Verification unavailable"); return true; }
+    catch (error) { if (isAPIError(error) && error.status === "UNAUTHORIZED") return false; throw error; }
+  },
+}));
 indexRouter.use(createSafeMvpRouter(async req => Boolean(await userIdFor(req))));
 indexRouter.use(createRunHistoryRouter(userIdFor, postgresHistoryStore(prisma), historyLimiter(authRateStorage(prisma, envVars.BETTER_AUTH_SECRET))));
 const ownedGitHub = new OwnedGitHubIntake(fetch);

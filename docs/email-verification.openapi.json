@@ -1,0 +1,437 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "RepoProof optional email ownership verification",
+    "version": "1.0.0",
+    "description": "Default ENABLE_EMAIL_VERIFICATION=false; enabling also requires approved SMTP. Native auth owns the emailVerified write. Purpose-bound 15-minute fragment links do not change email/password or sign in. Existing authentication and password-recovery contracts are unchanged. All operations are no-store and reject query input."
+  },
+  "paths": {
+    "/api/v1/email-verification": {
+      "get": {
+        "operationId": "emailVerificationCapability",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Public configuration only, not delivery proof",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Capability"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Safe v1 error; no token, user or provider details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/V1Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Safe v1 error; no token, user or provider details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/V1Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/email-verification/account": {
+      "get": {
+        "operationId": "ownEmailVerificationState",
+        "security": [
+          {
+            "SessionCookie": []
+          }
+        ],
+        "description": "Own email and authoritative verification state. Shared read quotas; no client-selected user ID.",
+        "responses": {
+          "200": {
+            "description": "Current authenticated account only",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Account"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Safe v1 error; no token, user or provider details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/V1Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Safe v1 error; no token, user or provider details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/V1Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Safe v1 error; no token, user or provider details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/V1Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Safe v1 error; no token, user or provider details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/V1Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/email-verification/request": {
+      "post": {
+        "operationId": "requestOwnEmailVerification",
+        "security": [
+          {
+            "SessionCookie": []
+          }
+        ],
+        "description": "Trusted frontend Origin, empty bounded JSON object and authoritative session required. Recipient comes only from that session; no caller-supplied email/callback. Idempotent if already verified. Delivery is limited to 3/user/15 minutes and 30 global/minute; request IP 10/5 minutes. Disabled mail/storage failures fail closed.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Request"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Acknowledged; does not guarantee inbox delivery",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Success"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Safe v1 error; no token, user or provider details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/V1Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Safe v1 error; no token, user or provider details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/V1Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Safe v1 error; no token, user or provider details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/V1Error"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "Safe v1 error; no token, user or provider details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/V1Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Safe v1 error; no token, user or provider details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/V1Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Safe v1 error; no token, user or provider details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/V1Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Safe v1 error; no token, user or provider details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/V1Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Safe v1 error; no token, user or provider details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/V1Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/email-verification/confirm": {
+      "post": {
+        "operationId": "confirmEmailVerification",
+        "security": [],
+        "description": "Trusted frontend Origin and bounded JSON capability only. HS256 signature, exact purpose/payload, issued time and maximum 15-minute lifetime checked before native auth verifies email. Raw native/email-change/expired/forged tokens are rejected. Valid confirmation is idempotent until expiry, without new sessions, password/email changes or public user details. Shared 10/IP/5-minute and 60 global/minute limits. Native query-token and anonymous resend HTTP routes are disabled.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Confirm"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Email ownership confirmed, no login",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Success"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Safe v1 error; no token, user or provider details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/V1Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Safe v1 error; no token, user or provider details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/V1Error"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "Safe v1 error; no token, user or provider details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/V1Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Safe v1 error; no token, user or provider details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/V1Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Safe v1 error; no token, user or provider details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/V1Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Safe v1 error; no token, user or provider details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/V1Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Safe v1 error; no token, user or provider details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/V1Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "SessionCookie": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "better-auth.session_token",
+        "description": "Native HttpOnly session; production uses the __Secure- prefix. Same-origin secure cookie policy is preserved."
+      }
+    },
+    "schemas": {
+      "Capability": {
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "enabled"
+        ],
+        "additionalProperties": false
+      },
+      "Account": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "maxLength": 320,
+            "format": "email",
+            "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+          },
+          "verified": {
+            "type": "boolean"
+          },
+          "enabled": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "email",
+          "verified",
+          "enabled"
+        ],
+        "additionalProperties": false
+      },
+      "Request": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "Confirm": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "minLength": 80,
+            "maxLength": 2048,
+            "pattern": "^[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+$"
+          }
+        },
+        "required": [
+          "token"
+        ],
+        "additionalProperties": false
+      },
+      "Success": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "boolean",
+            "const": true
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "additionalProperties": false
+      },
+      "V1Error": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "pattern": "^[A-Z][A-Z0-9_]*$"
+              },
+              "message": {
+                "type": "string",
+                "minLength": 1
+              },
+              "requestId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^[A-Za-z0-9_-]+$"
+              }
+            },
+            "required": [
+              "code",
+              "message",
+              "requestId"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "error"
+        ],
+        "additionalProperties": false
+      }
+    }
+  }
+}

@@ -5,8 +5,8 @@
 Active candidates remain the independent full-product-backend and
 full-product-frontend worktrees on their existing feature/full-product branches.
 No original branch, dirty checkout or commit was overwritten. The frontend is
-31fc3baf05a75076821324da07ad693423b32e67; six public contract files pin backend
-1efd0001abac44d82f0658d2c464dd9d6b523030. The canonical board and append-only
+389f03067053b992791aa40d8e7f937433b331fa; seven public contract files pin backend
+0672347794e7f276a5ae50b157e684404171ce98. The canonical board and append-only
 output/full-product-2026-11-02/progress.jsonl hold exact commit/test receipts.
 
 - Actual /dashboard and /history, original SVG identity and responsive shared
@@ -16,11 +16,21 @@ output/full-product-2026-11-02/progress.jsonl hold exact commit/test receipts.
   frontend 31fc3baf05a75076821324da07ad693423b32e67. Preserved original workflow
   at /workspace. Fresh 83 tests and ten production proxy/browser modules pass;
   original account, draft, issue and deadline behavior remains verified.
-- RPF-AUTH-002BE adds local native password recovery, hashed 15-minute tokens,
+- RPF-AUTH-002BE (0672347794e7f276a5ae50b157e684404171ce98) adds local native password recovery, hashed 15-minute tokens,
   atomic consumption/revocation/password writes, shared SQL quotas, safe auth
   failures and TLS mail. Fresh 771 tests, clean quality gates and actual source/
-  exported-Function restricted-PostgreSQL/TLS sink proof; frontend recovery is
-  the next separate ticket. External mail remains disabled and unverified.
+  exported-Function restricted-PostgreSQL/TLS sink proof. Frontend 389f030 adds
+  actual /forgot-password and /reset-password with 93 tests, twelve browser
+  modules, real mail-link/SQL/session proof and five viewport widths; backend
+  tracking 557a09d7f381e3652d45d03962b3310198a83215. External mail remains
+  disabled and unverified.
+- RPF-AUTH-003BE adds optional email ownership confirmation through native auth,
+  purpose-bound 15-minute fragment tokens, separate strict JSON account/request/
+  confirm APIs, bounded bodies and shared SQL quotas. Fresh 780 tests, complete
+  local quality gates and source/Function restricted-PostgreSQL/TLS proof pass.
+  Current frontend contracts/recovery are verified compatible with the new flag
+  off. Email verification frontend is the next separate ticket. Default is off;
+  no automatic login/email/password change or run-verdict authority is added.
 - Provider account read: authenticated Meta catalog works. The signed-in usage
   page displays 120 requests and $0.00 for October 27–November 2; Billing remains
   stuck loading. This does not prove enforceable future no-charge entitlement.
@@ -32,7 +42,7 @@ output/full-product-2026-11-02/progress.jsonl hold exact commit/test receipts.
   with eleven existing migrations, a limited runtime role and 0/0/0 product rows.
 
 The product remains PARTIALLY_COMPLETE_WITH_BLOCKERS. Full execution, genuine
-provider/runner acceptance, reports/artifacts, recovery UI, OAuth/verification
+provider/runner acceptance, reports/artifacts, OAuth/email-verification UI
 and the other unimplemented product pages remain required. RPF-004 stays
 IN_PROGRESS; RPF-006A stays DEFERRED. Continue independent local work.
 
@@ -114,7 +124,8 @@ NOT_APPLICABLE records explicitly later/conditional product scope.
 | Public landing and scope disclosure | COMPLETE (local page) | No API required | Premium public /, dedicated /sign-in and /sign-up; existing /workspace and /runs/new preserved | RPF-WEB-003FE real production proxy/browser and five landing widths pass; desktop/mobile screenshots reviewed. Broader missing app pages remain separate requirements. |
 | Registration, email sign-in, session, logout | COMPLETE (local core) | Better Auth + PostgreSQL user/session/account; shared throttling, CSRF/origin and HttpOnly cookies | Dedicated entry routes and preserved workspace forms | RPF-WEB-003FE fresh production proxy/browser checks include authoritative session confirmation, fixed redirect, native cooldown and safe errors. Deployed HTTPS remains unverified. |
 | Account/profile and session management | COMPLETE (scoped local UI) | Native Better Auth update-user/change-password/revoke-other APIs; account deletion/email change remain disabled | /settings edits profile/password and confirms other-device revocation | RPF-ACC-001FE real restricted PostgreSQL/proxy browser, multi-device/other-owner/expiry and 1280/768/390/320 px proof. No destructive account control. |
-| Password recovery | PARTIAL | RPF-AUTH-002BE native hashed 15-minute tokens, atomic all-session revocation/password write, shared SQL quotas and asynchronous TLS mail; off by default | Frontend forms are the next separate ticket | Fresh local source/Function HTTP with restricted PostgreSQL and certificate-verified TLS sink proves rollback/concurrency/expiry/ownership/quota/safe errors. External email and cloud request lifetime remain unverified. |
+| Password recovery | PARTIAL (local integration complete) | RPF-AUTH-002BE native hashed 15-minute tokens, atomic all-session revocation/password write, shared SQL quotas and asynchronous TLS mail; off by default | RPF-AUTH-002FE /forgot-password and /reset-password with real configured availability | Actual mail-link/production-proxy/restricted SQL/TLS browser proof plus rollback/concurrency/expiry/ownership/quotas, 93 frontend tests and twelve browser modules. External inbox delivery and cloud request lifetime remain unverified. |
+| Email ownership verification | PARTIAL | RPF-AUTH-003BE optional native authority, purpose-bound 15-minute fragment capability, owned request/status, bounded JSON confirmation and shared SQL quotas; off by default | Separate frontend consumer remains next | Real restricted SQL/source/Function/TLS proof: signup/resend, ownership, safe failed-write retry, idempotency, actual quota, synthetic expiry/scope negatives and no auto-login/email/password mutation. No external delivery claim. |
 | Google authentication when enabled | MISSING | Environment validates GOOGLE_* but auth has no socialProviders registration | No provider button | Local wiring/disabled state can be implemented. Actual callback origins and interactive provider verification remain external. |
 | FR-01 / F-01 approved repository selection | PARTIAL | Authenticated curated catalog/draft and owned live issue preview persist/read | /runs/new inspects actual title/body/commit, refreshes/cancels and saves draft | Fresh real PostgreSQL/proxy/browser/GitHub metadata proof. No arbitrary repos; run creation/snapshot persistence remains gated. |
 | GitHub issue/source validation | PARTIAL | OwnedGitHubIntake pins commit/tree/blob bytes; RPF-012I registers bounded authenticated issue/commit preview | RPF-013I consumes real issue/pin with safe plain-text rendering | Live metadata checks pass through local auth/SQL/Function/browser. Full source intake remains separately gated and unregistered; preview grants no source/execution authority. |
@@ -184,8 +195,8 @@ NOT_APPLICABLE records explicitly later/conditional product scope.
 
 | Area | Actual status |
 | --- | --- |
-| Frontend | 31fc3baf / feature/full-product-frontend; public entry, dashboard/history, account and existing catalog/draft/issue flows. Original checkout .gitignore remains preserved. Recovery UI is next. |
-| Backend | feature/full-product-backend includes tested engine/release foundation, history and local recovery backend; execution remains unavailable. |
+| Frontend | 389f0306 / feature/full-product-frontend; public entry, dashboard/history, account, actual recovery and existing catalog/draft/issue flows. Original checkout .gitignore remains preserved. Email verification UI is next. |
+| Backend | feature/full-product-backend includes tested engine/release foundation, history, local recovery and optional email verification backend; execution remains unavailable. |
 | Database | Original rpf-predeploy-20261101 tmpfs container stopped with Docker; historical evidence preserved. New independent rpf-recovery-20261103 has eleven migrations and limited rpf_recovery_runtime on loopback 35441. No cloud validation. |
 | Configuration | MODEL_API_KEY, Neon DATABASE_URL and optional Google credentials exist by name. Active files lack BETTER_AUTH_SECRET, BETTER_AUTH_URL and FRONTEND_URL. Never print/copy secret values into evidence. |
 | Meta | Live no-charge entitlement not established; default denial remains. |
@@ -204,8 +215,9 @@ NOT_APPLICABLE records explicitly later/conditional product scope.
    code and backend tracking commits, actual browser/API/database verification.
 3. RPF-ACC-001FE, RPF-HISTORY-001BE, RPF-DASH-001FE and RPF-WEB-003FE are
    complete in their recorded local scopes; do not reimplement them.
-4. Complete the separate RPF-AUTH-002FE recovery forms against the actual native
-   backend/capability contract, with local TLS/SQL production-proxy browser proof.
+4. RPF-AUTH-002FE recovery is locally complete. Complete RPF-AUTH-003FE email
+   verification against the scoped native-backed JSON APIs, with local TLS/SQL
+   production-proxy browser proof and unchanged password-recovery compatibility.
    Then continue remaining independent eligible account/repository/detail pages.
    Keep full run/report prerequisites and missing provider evidence explicit.
 5. Resume the exact next eligible implementation after each reviewed commit;

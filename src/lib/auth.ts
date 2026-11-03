@@ -8,6 +8,7 @@ import { authRateStorage } from "./authRateLimit";
 import { waitUntil } from "@vercel/functions";
 import { passwordRecoveryOptions, passwordRecoveryRules } from "./passwordRecovery";
 import { createPasswordMailer } from "./passwordMail";
+import { createVerificationMailer, emailVerificationOptions } from "./emailVerification";
 
 const security = securityConfig(envVars.FRONTEND_URL, envVars.NODE_ENV === "production", envVars.BETTER_AUTH_URL);
 const cookiePolicy = authSecurityOptions(security.allowedOrigin, envVars.NODE_ENV === "production", envVars.BETTER_AUTH_URL === envVars.FRONTEND_URL);
@@ -16,6 +17,7 @@ const recovery = passwordRecoveryOptions(envVars.FRONTEND_URL, envVars.EMAIL_SEN
 export const auth = betterAuth({
     ...cookiePolicy,
     ...recovery,
+    ...emailVerificationOptions(envVars.EMAIL_VERIFICATION_ENABLED, envVars.BETTER_AUTH_SECRET, envVars.EMAIL_SENDER ? createVerificationMailer(envVars.EMAIL_SENDER, envVars.FRONTEND_URL) : async () => { throw new Error("Verification delivery unavailable"); }, rateStorage),
     secret: envVars.BETTER_AUTH_SECRET,
     baseURL: envVars.BETTER_AUTH_URL,
     session: {

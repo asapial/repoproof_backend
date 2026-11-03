@@ -13,6 +13,7 @@ export function createApp(authHandler: RequestHandler, router: Router, frontendU
   app.use(security.cors);
   // Pinned Better Call supports parsed JSON. Bound it before auth processing.
   app.use("/api/auth", ...authRequestGuards(process.env.VERCEL === "1"));
+  app.use("/api/v1/email-verification", ...authRequestGuards(process.env.VERCEL === "1", 5000, (res, status, message) => sendV1Error(res, status, status === 503 ? "EMAIL_VERIFICATION_UNAVAILABLE" : status === 408 ? "REQUEST_TIMEOUT" : status === 413 ? "PAYLOAD_TOO_LARGE" : status === 415 ? "UNSUPPORTED_MEDIA_TYPE" : "INVALID_INPUT", message)));
   app.all('/api/auth/*splat', authHandler);
   app.use(cookieParser());
   app.use(express.json({ limit: "100kb" }));
