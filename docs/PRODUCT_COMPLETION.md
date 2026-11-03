@@ -1,6 +1,42 @@
 # Full-product completion ledger
 
-## Resumed full-product mission — November 2, 2026
+## Current accepted scope — November 3, 2026
+
+Active candidates remain the independent full-product-backend and
+full-product-frontend worktrees on their existing feature/full-product branches.
+No original branch, dirty checkout or commit was overwritten. The frontend is
+31fc3baf05a75076821324da07ad693423b32e67; six public contract files pin backend
+1efd0001abac44d82f0658d2c464dd9d6b523030. The canonical board and append-only
+output/full-product-2026-11-02/progress.jsonl hold exact commit/test receipts.
+
+- Actual /dashboard and /history, original SVG identity and responsive shared
+  navigation: frontend 664415514f27137d4547ff76af6e540af7b13f0f. Real proxy/SQL
+  counts, draft/history/expiry/error states and 1440/1280/768/390/320 px checks.
+- Public landing and dedicated /sign-in and /sign-up:
+  frontend 31fc3baf05a75076821324da07ad693423b32e67. Preserved original workflow
+  at /workspace. Fresh 83 tests and ten production proxy/browser modules pass;
+  original account, draft, issue and deadline behavior remains verified.
+- RPF-AUTH-002BE adds local native password recovery, hashed 15-minute tokens,
+  atomic consumption/revocation/password writes, shared SQL quotas, safe auth
+  failures and TLS mail. Fresh 771 tests, clean quality gates and actual source/
+  exported-Function restricted-PostgreSQL/TLS sink proof; frontend recovery is
+  the next separate ticket. External mail remains disabled and unverified.
+- Provider account read: authenticated Meta catalog works. The signed-in usage
+  page displays 120 requests and $0.00 for October 27–November 2; Billing remains
+  stuck loading. This does not prove enforceable future no-charge entitlement.
+  Vercel UI shows Hobby and unused included Sandbox quotas in its selected
+  period; CLI login is missing. No inference, Sandbox or billing changes occur.
+- Docker stopped the earlier tmpfs DB container. Its original container and
+  historical evidence remain intact; no old database is claimed live. Recovery
+  uses the new independent rpf-recovery-20261103 container on loopback 35441,
+  with eleven existing migrations, a limited runtime role and 0/0/0 product rows.
+
+The product remains PARTIALLY_COMPLETE_WITH_BLOCKERS. Full execution, genuine
+provider/runner acceptance, reports/artifacts, recovery UI, OAuth/verification
+and the other unimplemented product pages remain required. RPF-004 stays
+IN_PROGRESS; RPF-006A stays DEFERRED. Continue independent local work.
+
+## Initial mission resumption — November 2, 2026
 
 The current goal authorizes sequential reviewed local feature commits and a
 hard $0 cash limit. Bounded Meta/Sandbox smoke tests are conditional on verified
@@ -75,9 +111,10 @@ NOT_APPLICABLE records explicitly later/conditional product scope.
 
 | Requirement | State | Backend / persistence | Actual frontend | Tests / security / integration evidence and remaining work |
 | --- | --- | --- | --- | --- |
-| Public landing and scope disclosure | PARTIAL | No API required | / and /runs/new now share real Home/New verification navigation | Fresh real browser and desktop/tablet/mobile screenshots pass. Remaining app pages are still missing. Primary old e9a4a6e checkout renders only a title and two paragraphs; do not confuse it with the candidate. |
-| Registration, email sign-in, session, logout | COMPLETE (local core) | Better Auth + PostgreSQL user/session/account; shared throttling, CSRF/origin and HttpOnly cookies | Working same-page forms | Historical real PostgreSQL/proxy browser tests. Fresh product validation and deployed HTTPS remain required. |
-| Account/profile and session management | PARTIAL | Native Better Auth update-user/change-password/session APIs exist; account deletion/email change are not enabled | No account/settings view | Add real consumers, negative auth/origin/session tests and browser recovery. No new parallel auth system. |
+| Public landing and scope disclosure | COMPLETE (local page) | No API required | Premium public /, dedicated /sign-in and /sign-up; existing /workspace and /runs/new preserved | RPF-WEB-003FE real production proxy/browser and five landing widths pass; desktop/mobile screenshots reviewed. Broader missing app pages remain separate requirements. |
+| Registration, email sign-in, session, logout | COMPLETE (local core) | Better Auth + PostgreSQL user/session/account; shared throttling, CSRF/origin and HttpOnly cookies | Dedicated entry routes and preserved workspace forms | RPF-WEB-003FE fresh production proxy/browser checks include authoritative session confirmation, fixed redirect, native cooldown and safe errors. Deployed HTTPS remains unverified. |
+| Account/profile and session management | COMPLETE (scoped local UI) | Native Better Auth update-user/change-password/revoke-other APIs; account deletion/email change remain disabled | /settings edits profile/password and confirms other-device revocation | RPF-ACC-001FE real restricted PostgreSQL/proxy browser, multi-device/other-owner/expiry and 1280/768/390/320 px proof. No destructive account control. |
+| Password recovery | PARTIAL | RPF-AUTH-002BE native hashed 15-minute tokens, atomic all-session revocation/password write, shared SQL quotas and asynchronous TLS mail; off by default | Frontend forms are the next separate ticket | Fresh local source/Function HTTP with restricted PostgreSQL and certificate-verified TLS sink proves rollback/concurrency/expiry/ownership/quota/safe errors. External email and cloud request lifetime remain unverified. |
 | Google authentication when enabled | MISSING | Environment validates GOOGLE_* but auth has no socialProviders registration | No provider button | Local wiring/disabled state can be implemented. Actual callback origins and interactive provider verification remain external. |
 | FR-01 / F-01 approved repository selection | PARTIAL | Authenticated curated catalog/draft and owned live issue preview persist/read | /runs/new inspects actual title/body/commit, refreshes/cancels and saves draft | Fresh real PostgreSQL/proxy/browser/GitHub metadata proof. No arbitrary repos; run creation/snapshot persistence remains gated. |
 | GitHub issue/source validation | PARTIAL | OwnedGitHubIntake pins commit/tree/blob bytes; RPF-012I registers bounded authenticated issue/commit preview | RPF-013I consumes real issue/pin with safe plain-text rendering | Live metadata checks pass through local auth/SQL/Function/browser. Full source intake remains separately gated and unregistered; preview grants no source/execution authority. |
@@ -89,15 +126,15 @@ NOT_APPLICABLE records explicitly later/conditional product scope.
 | FR-05 / F-06 source-only patch | PARTIAL | Typed bounded proposals, admissibility, immutable snapshots and no-follow guest preparation | No patch details | Source-only policy tested offline. Live patching remains downstream of genuinely reproduced baseline. |
 | FR-06 / F-07 identical-test independent retest | BLOCKED | Pure policy plus synthetic pipeline; no authenticated execution adapter | No deterministic report view | No live isolation/provenance proof. Synthetic receipts always authentic:false; production cannot claim VERIFIED. |
 | FR-07 / F-08 reports and artifacts | PARTIAL | Immutable SQL evidence schema and target report DTO; no authorized retrieval/export/byte store integration | No report route/diff/downloads | SQL constraints tested historically. Must authenticate owner, verify bytes/provenance and escape untrusted content before exposing evidence. |
-| Run history, progress, cancellation, retry | PARTIAL | PostgreSQL lease/replay/quarantine/stage foundations; no public lifecycle/read APIs | No history/timeline | Existing durable SQL tests do not prove the product job workflow. Read-only owner history can be split independently; no fabricated runs. |
+| Run history, progress, cancellation, retry | PARTIAL | RPF-HISTORY-001BE exposes actual owned stored history/counts; lease/replay/quarantine/stage foundations remain preparatory | /history and /dashboard consume real records/counts; no timeline/cancel/retry | Restricted PostgreSQL source/Function and production proxy/browser proof. Synthetic paging/state cases are labeled; no execution or verdict claim. Full durable lifecycle remains missing. |
 | FR-09 / F-09 three genuine demos | BLOCKED | One owned fixture; synthetic cases cover false fix/no repro | No demo page | Need real approved end-to-end cases and recorded artifacts. Synthetic cases must never become a production dashboard. |
 | Meta authentication/catalog/structured tasks | PARTIAL | Meta adapter, catalog-bound tasks, abort/deadlines, accounting; key present locally | No provider status or analysis | Historical paid smoke is not current permission. No provider-enforced no-charge entitlement/reservation controller is proven. |
 | Meta durable usage/replay/idempotency | PARTIAL | Immutable attempt/outcome accounting and quarantined effects | No usage display | Real local PostgreSQL checks exist. Actual provider dispatch and zero-charge reservation remain unavailable. |
 | RPF-004 isolated execution | BLOCKED | Disabled Vercel SDK/admin smoke, packets and resource/guest preparations | Truthful RUNNER_UNAVAILABLE | No real image/network/IPv4/IPv6/metadata/FS/cross-VM/resource/cleanup/provenance verification. Separate live authorization required. |
 | Durable orchestration and recovery | PARTIAL | PostgreSQL CAS/leases/replay/freeze/journal/reconciliation foundations | No lifecycle consumer | No Function-compatible live stage executor; uncertain effects remain quarantined. Prove lease/SQL/Function/provider timing before activation. |
-| Neon migrations/runtime/backup | PARTIAL | Ten versioned migrations, role/grant and backup procedures; real local SQL evidence | Auth/drafts use real local database in integration | Configured Neon URL is not a proven least-privilege/TLS/free-plan target. No owner DIRECT_URL supplied; no cloud writes approved. |
+| Neon migrations/runtime/backup | PARTIAL | Eleven versioned migrations, role/grant and backup procedures; real local SQL evidence | Auth/drafts/history use restricted local SQL in integration | Recovery DB is a new independent container after the earlier tmpfs instance stopped. Configured Neon URL is not a proven least-privilege/TLS/free-plan target. No cloud writes approved. |
 | Frontend/backend security integration | PARTIAL | Strict DTOs, same-origin proxy, no-store, origin/CSRF, shared auth limits | Session-expiry/deadline recovery exists | Historical real proxy browser plus fault-injection checks. New workflow needs fresh owner/malformed/timeout/denied integration checks. |
-| Responsive/accessibility/navigation | PARTIAL | N/A | Current page has labels/loading/empty/error states and mobile CSS | Required page set/navigation missing; verify rendered desktop/tablet/mobile and keyboard behavior after UI changes. |
+| Responsive/accessibility/navigation | PARTIAL | N/A | Original SVG identity/tokens, responsive shared shell, dashboard/history/account/public entry, labels and safe errors | Real browser/keyboard and desktop/laptop/tablet/390/320 px proof for shipped pages. The remaining required page set still needs implementation and fresh verification. |
 | API documentation and inventory | PARTIAL | Existing schema snapshots; inventory added in API_INVENTORY.md | Current consumers documented | Add strict contracts for each new surface and safe OpenAPI where useful. Unimplemented paths remain explicit. |
 | Operational health/logging/quotas | PARTIAL | /healthz, /readyz, redacted auth errors, bounded pools, no secret logs | No settings/status page | Local tests exist. Deployed trusted-IP, shared quotas, monitoring and live runner health remain unverified. |
 | Vercel frontend/backend readiness | PARTIAL | Express export/Prisma generation, Node24 config, migration/rollback package | Same-origin server rewrite uses REPOPROOF_API_ORIGIN | Historical local build/Function/proxy checks. Actual eligible free account, exact origins, deployed tracing/HTTPS and owner approval absent. |
@@ -147,9 +184,9 @@ NOT_APPLICABLE records explicitly later/conditional product scope.
 
 | Area | Actual status |
 | --- | --- |
-| Frontend | 06f1c5b / feature/rpf-013i-issue-workflow, descendant of f9519df; functional auth/catalog/draft/live issue inspector. Other main pages remain missing. Original .gitignore edit preserved. |
-| Backend | Engine branch includes release baseline, offline foundations, reporter and live read-only issue preview; execution remains unavailable. |
-| Database | Owned local PostgreSQL rpf-predeploy-20261101 is live. New rpf_product_disposable has ten migrations and a limited rpf_product_runtime role; other databases/immutable synthetic evidence preserved. No cloud validation. |
+| Frontend | 31fc3baf / feature/full-product-frontend; public entry, dashboard/history, account and existing catalog/draft/issue flows. Original checkout .gitignore remains preserved. Recovery UI is next. |
+| Backend | feature/full-product-backend includes tested engine/release foundation, history and local recovery backend; execution remains unavailable. |
+| Database | Original rpf-predeploy-20261101 tmpfs container stopped with Docker; historical evidence preserved. New independent rpf-recovery-20261103 has eleven migrations and limited rpf_recovery_runtime on loopback 35441. No cloud validation. |
 | Configuration | MODEL_API_KEY, Neon DATABASE_URL and optional Google credentials exist by name. Active files lack BETTER_AUTH_SECRET, BETTER_AUTH_URL and FRONTEND_URL. Never print/copy secret values into evidence. |
 | Meta | Live no-charge entitlement not established; default denial remains. |
 | Sandbox/security | Zero new live calls/VMs; RPF-004 unverified; independent observer and real isolation acceptance missing. |
@@ -165,13 +202,12 @@ NOT_APPLICABLE records explicitly later/conditional product scope.
 2. RPF-013I (completed locally): frontend issue-selection/inspection route consuming that actual API;
    preserve current auth/drafts and unavailable execution. Separate frontend
    code and backend tracking commits, actual browser/API/database verification.
-3. RPF-ACC-001FE (current next): account/profile/password and revoke-other-session
-   controls using the actual native authenticated endpoints, after RPF-SEC-007.
-   Verify real own-user behavior, safe errors, confirmation of session changes,
-   expiry and responsive keyboard/browser flows. No destructive account deletion.
-4. Independently split owner-scoped read-only history from execution creation;
-   add account/session/settings/navigation using actual authorized records.
-   Keep parent run/report prerequisites and missing live evidence explicit.
+3. RPF-ACC-001FE, RPF-HISTORY-001BE, RPF-DASH-001FE and RPF-WEB-003FE are
+   complete in their recorded local scopes; do not reimplement them.
+4. Complete the separate RPF-AUTH-002FE recovery forms against the actual native
+   backend/capability contract, with local TLS/SQL production-proxy browser proof.
+   Then continue remaining independent eligible account/repository/detail pages.
+   Keep full run/report prerequisites and missing provider evidence explicit.
 5. Resume the exact next eligible implementation after each reviewed commit;
    update this ledger, API inventory and canonical board with real evidence.
 

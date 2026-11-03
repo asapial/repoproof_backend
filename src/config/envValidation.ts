@@ -1,6 +1,7 @@
 type Environment = Readonly<Record<string, string | undefined>>;
 type CloudinaryConfig = { CLOUDINARY_CLOUD_NAME: string; CLOUDINARY_API_KEY: string; CLOUDINARY_API_SECRET: string };
-type SmtpConfig = { SMTP_USER: string; SMTP_PASS: string; SMTP_HOST: string; SMTP_PORT: string; SMTP_FROM: string };
+import { z } from "zod";
+import type { SmtpConfig } from "../lib/passwordMail";
 type GoogleConfig = { clientId: string; clientSecret: string; callbackUrl: string };
 type LegacyJwtConfig = { accessSecret: string; refreshSecret: string; accessExpiresIn: string; refreshExpiresIn: string };
 
@@ -60,7 +61,11 @@ export function parseEnvironment(input: Environment) {
   const jwtEnabled = enabled(input, "ENABLE_LEGACY_JWT");
   const metaEnabled = enabled(input, "ENABLE_META");
   if (metaEnabled) required(input, "MODEL_API_KEY");
-  const smtp: SmtpConfig | null = smtpEnabled ? { SMTP_USER: required(input, "EMAIL_SENDER_SMTP_USER"), SMTP_PASS: required(input, "EMAIL_SENDER_SMTP_PASS"), SMTP_HOST: required(input, "EMAIL_SENDER_SMTP_HOST"), SMTP_PORT: port(input, "EMAIL_SENDER_SMTP_PORT"), SMTP_FROM: required(input, "EMAIL_SENDER_SMTP_FROM") } : null;
+  const smtp: SmtpConfig | null = smtpEnabled ? { SMTP_USER: required(input, "EMAIL_SENDER_SMTP_USER"), SMTP_PASS: required(input, "EMAIL_SENDER_SMTP_PASS"), SMTP_HOST: required(input, "EMAIL_SENDER_SMTP_HOST"), SMTP_PORT: port(input, "EMAIL_SENDER_SMTP_PORT"), SMTP_FROM: required(input, "EMAIL_SENDER_SMTP_FROM"), SMTP_SECURE: input.EMAIL_SENDER_SMTP_SECURE === undefined ? input.EMAIL_SENDER_SMTP_PORT === "465" : enabled(input, "EMAIL_SENDER_SMTP_SECURE") } : null;
+  if (smtp) {
+    if (!/^(?:[A-Za-z0-9](?:[A-Za-z0-9.-]{0,251}[A-Za-z0-9])?|\[[0-9A-Fa-f:]+\])$/.test(smtp.SMTP_HOST)) throw new Error("EMAIL_SENDER_SMTP_HOST must be a host name or IP address");
+    if (!z.email().max(320).safeParse(smtp.SMTP_FROM).success) throw new Error("EMAIL_SENDER_SMTP_FROM must be a single email address");
+  }
   const google: GoogleConfig | null = googleEnabled ? { clientId: required(input, "GOOGLE_CLIENT_ID"), clientSecret: required(input, "GOOGLE_CLIENT_SECRET"), callbackUrl: required(input, "GOOGLE_CALLBACK_URL") } : null;
   if (google) {
     let callback: URL;

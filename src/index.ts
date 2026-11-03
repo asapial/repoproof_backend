@@ -11,12 +11,14 @@ import { envVars } from "./config/env";
 import { OwnedGitHubIntake } from "./verification/githubIntake";
 import { createRunHistoryRouter, historyLimiter } from "./safeMvp/history";
 import { postgresHistoryStore } from "./safeMvp/historyStore";
+import { createAuthCapabilitiesRouter } from "./safeMvp/authCapabilities";
 
 const userIdFor = async (req: Parameters<Parameters<typeof createDraftRouter>[0]>[0]) => {
   const session = await auth.api.getSession({ headers: fromNodeHeaders(req.headers) });
   return session?.user?.id ?? null;
 };
 export const indexRouter = Router();
+indexRouter.use(createAuthCapabilitiesRouter(Boolean(envVars.EMAIL_SENDER)));
 indexRouter.use(createSafeMvpRouter(async req => Boolean(await userIdFor(req))));
 indexRouter.use(createRunHistoryRouter(userIdFor, postgresHistoryStore(prisma), historyLimiter(authRateStorage(prisma, envVars.BETTER_AUTH_SECRET))));
 const ownedGitHub = new OwnedGitHubIntake(fetch);

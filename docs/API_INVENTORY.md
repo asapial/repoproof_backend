@@ -1,4 +1,4 @@
-# RepoProof API inventory — November 2, 2026
+# RepoProof API inventory — November 3, 2026
 
 Observed sources: src/appFactory.ts, src/index.ts, src/safeMvp/{router,drafts}.ts,
 src/contracts/{v1,safeMvp,requestDraft}.ts and pinned Better Auth 1.7.14 routes.
@@ -13,9 +13,10 @@ guest helpers are unregistered; do not document or expose them as public APIs.
 | GET / | none / service status, environment, uptime/time | Public | Legacy status, not versioned business data; no frontend dependency. |
 | GET /healthz | none / {status:ok} | Public | no-store; liveness only; health.test.ts. |
 | GET /readyz | none / {status:ready or unavailable} | Public | Bounded DB probe, 503 on timeout/failure; no-store; health.test.ts. |
+| GET /api/v1/auth-capabilities | no query / authCapabilitiesSchema | Public configuration only; no account lookup | no-store, 400 for query; configured password-reset availability only, not delivery proof. Real SQL/source/Function and unit checks; frontend recovery consumer next. |
 | GET /api/v1/repositories | none / safeFixtureCatalogSchema | Session; public curated allowlist | 401/500; no-store; SafeMvp catalog(); router.test.ts and historical real SQL/browser. |
-| GET /api/v1/runs | strict limit/cursor / runHistoryResponseSchema | Session-resolved owner and fixed approved fixture/pin; null/other owners excluded | 400/401/429/503/500; no-store; shared owner/global PostgreSQL quota; narrow SQL projection. Real limited-role source/Function, two-user, pagination/privilege and synthetic-record checks pass. Frontend dashboard/history consumer is the next ticket; stored states are not verdicts. |
-| GET /api/v1/repositories/repoproof-backend/issues | no query / issuePreviewSchema | Session; only owned approved repository/issue; pinned commit/tree | 400/401/403/404/429/503/500; PostgreSQL owner/global limits; two bounded GitHub GETs; no-store. RPF-012I real local auth/SQL and live public GitHub metadata passed, including exported Function bundle and limited-role checks. Frontend consumer pending RPF-013I. |
+| GET /api/v1/runs | strict limit/cursor / runHistoryResponseSchema | Session-resolved owner and fixed approved fixture/pin; null/other owners excluded | 400/401/429/503/500; no-store; shared owner/global PostgreSQL quota; narrow SQL projection. Real limited-role source/Function, two-user, pagination/privilege and synthetic-record checks pass. Frontend /dashboard and /history consume actual stored records/counts; stored states are not verdicts. |
+| GET /api/v1/repositories/repoproof-backend/issues | no query / issuePreviewSchema | Session; only owned approved repository/issue; pinned commit/tree | 400/401/403/404/429/503/500; PostgreSQL owner/global limits; two bounded GitHub GETs; no-store. RPF-012I real local auth/SQL and live public GitHub metadata passed, including exported Function bundle and limited-role checks. RPF-013I /runs/new consumes real preview data with browser/API proof. |
 | GET /api/v1/request-draft | none / requestDraftResponseSchema | Session owner resolved server-side | 401/500; no-store; SafeMvp draft(); drafts.test.ts and real two-user SQL/browser. |
 | PUT /api/v1/request-draft | requestDraftSchema / requestDraftResponseSchema | Session owner, approved exact fixture; CSRF Origin | 400/401/403/404/500; one saved draft per user; SafeMvp saveDraft(); SQL constraints and owner tests. |
 | DELETE /api/v1/request-draft | no body / {draft:null} | Session owner; CSRF Origin | 401/403/500; idempotent; SafeMvp deleteDraft(); two-user SQL/browser. |
@@ -33,8 +34,8 @@ All browser clients send credentials and no-store and never store session tokens
 
 | Method / suffix under /api/auth | Availability and ownership | Current frontend consumer / verification |
 | --- | --- | --- |
-| POST /sign-up/email | Enabled; {name,email,password}; creates own account/session | SafeMvp registration; actual SQL/browser/security tests. |
-| POST /sign-in/email | Enabled; {email,password}; own account/session | SafeMvp sign-in; wrong-password/throttle/session tests. |
+| POST /sign-up/email | Enabled; {name,email,password}; creates own account/session | /sign-up and preserved /workspace forms; actual SQL/browser/security tests. |
+| POST /sign-in/email | Enabled; {email,password}; own account/session | /sign-in and preserved /workspace forms; wrong-password/throttle/session tests. |
 | GET /get-session | Current authoritative DB session or null; legacy cache cleared | SafeMvp loader; real SQL/browser/recovery/revocation. POST requires deferSessionRefresh and is not enabled. |
 | POST /sign-out | Current session | SafeMvp sign-out; actual SQL/browser. |
 | POST /update-user | Native current-user name/image update | /settings edits name only and confirms the authoritative account; real PostgreSQL/proxy browser persistence and revoked-cache denial pass. |
@@ -45,7 +46,10 @@ All browser clients send credentials and no-store and never store session tokens
 | POST /verify-password, /update-session | Framework native guards/options | No product consumer; do not present as completed product functionality. |
 | GET /list-accounts, /account-info | Framework native own-account guards | No product consumer; no public tokens returned by an app-owned wrapper. |
 | POST /sign-in/social, /link-social, /unlink-account, /get-access-token, /refresh-token; GET or POST /callback/:id | Framework routes present; no socialProviders configured | Google env validation alone does not enable OAuth. No connected-provider claim or UI. |
-| POST /request-password-reset, /reset-password, /send-verification-email; GET /reset-password/:token, /verify-email | Require configured email callbacks/verification options | Not configured; no working reset/verification advertised. |
+| POST /request-password-reset | Enabled only with explicit SMTP configuration; generic existing/unknown acknowledgement | Shared native-IP/address/global SQL quotas, 15-minute hashed token, fixed fragment link and async TLS delivery. Real source/Function restricted-PostgreSQL/TLS sink checks pass; frontend consumer next. |
+| POST /reset-password | Explicit SMTP required; token/newPassword in JSON, no query | Atomic one-time token, all-device revocation and credential write; safe rollback/concurrency/expiry tested. No auto-session. Frontend consumer next. |
+| GET /reset-password/:token | App intentionally rejects native URL-token callback; fragment link goes directly to the frontend | No supported consumer. Mail never contains a native token path or API query token. |
+| POST /send-verification-email; GET /verify-email | Verification callbacks/options remain unconfigured | No email-verification product claim. |
 | POST /change-email, /delete-user; GET /delete-user/callback | Require explicitly enabled features and framework freshness/verification | Not enabled; no destructive account control advertised. |
 | GET /ok, /error | Native framework health/error | No frontend dependency; not application readiness or provider evidence. |
 
@@ -74,3 +78,6 @@ The shipped issue preview is described in issue-preview.openapi.json (OpenAPI
 3.1, one operation; schemas exported from the actual strict Zod contracts).
 run-history.openapi.json separately describes the shipped GET history operation
 and its strict response/error schemas. No execution or report operation is added.
+auth-recovery.openapi.json describes the public capability and two native reset
+operations. PASSWORD_RECOVERY.md records local TLS/SQL proof, default disabled
+configuration, delivery boundaries and the pending separate frontend consumer.
