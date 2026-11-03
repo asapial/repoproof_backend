@@ -77,6 +77,30 @@ SQL details, addresses, reset tokens and SMTP secrets do not reach logs/response
 
 ## Observed local verification
 
+### Synthetic transaction fixture correction (RPF-TEST-006BE)
+
+The installed Better Auth 1.7.14 memory adapter clones transaction snapshots
+and explicitly merges same-row writes with last-writer-wins semantics. It does
+not implement PostgreSQL's concurrency contract. A later full-suite run exposed
+this fixture limitation: both concurrent reset requests returned 200.
+
+The unit fixture now serializes its memory-adapter transactions. All six tests
+and every original concurrent replay assertion remain unchanged, including one
+200, one 400, successful login with the winning password and rejection of the
+losing password. The unchanged concurrent-test block has SHA-256
+`9cb6369c7f9a392895dfcae8206614c7b0b5d4ba654fccf673f3e0c5035c33ae`.
+This synthetic fixture establishes no production locking or concurrency proof.
+The existing restricted PostgreSQL source/Function integration observations
+remain the separate evidence for actual transaction rollback and token reuse.
+
+A clean tracked-source copy passes six focused tests and 780 full tests in 56
+files, lint, types, production build, lint-toolchain checks and full/production
+audits with zero findings. Production authentication code, dependencies and
+contracts are unchanged. The failed run and correction are retained under
+`output/full-product-2026-11-02/evidence/harmless-full-quality.*` and
+`recovery-fixture-*`. Uncommitted harmless Sandbox preparation is excluded from
+this ticket and its tested copy.
+
 Node 24.22.2 clean lockfile install; 771 full tests in 54 files; lint, source and
 integration types, normal/Function builds, lint-toolchain checks and full/prod
 audits (zero findings) pass. Ten new focused cases are included in that full count.

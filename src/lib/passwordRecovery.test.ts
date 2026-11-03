@@ -10,6 +10,23 @@ import { createAuthCapabilitiesRouter } from "../safeMvp/authCapabilities";
 
 const origin = "http://localhost:3000", email = "recovery@example.test", password = "synthetic-original-password";
 const cookies = (response: Response) => response.headers.getSetCookie().map(value => value.split(";")[0]!).join("; ");
+function serializedMemory(records: Parameters<typeof memoryAdapter>[0]): ReturnType<typeof memoryAdapter> {
+  const factory = memoryAdapter(records); let previous = Promise.resolve();
+  return options => {
+    const adapter = factory(options);
+    // Native memory transactions clone a snapshot and intentionally resolve
+    // same-row writes last-writer-wins. Give this synthetic fixture an atomic
+    // transaction contract; actual Prisma/PostgreSQL concurrency has separate
+    // restricted-role integration evidence. No production lock is added here.
+    const serialized: typeof adapter = { ...adapter, transaction: async callback => {
+      const waiting = previous; let release!: () => void;
+      previous = new Promise<void>(resolve => { release = resolve; });
+      await waiting;
+      try { return await adapter.transaction(callback); } finally { release(); }
+    } };
+    return serialized;
+  };
+}
 async function withAuth(run: (context: {
   base: string; mail: Array<{ email: string; token: string }>;
   post: (path: string, body: unknown, cookie?: string, sentOrigin?: string | null) => Promise<Response>;
@@ -19,7 +36,7 @@ async function withAuth(run: (context: {
   const storage = { consume: vi.fn(async () => ({ allowed: true })) };
   const auth = betterAuth({ ...authSecurityOptions(origin, false),
     ...passwordRecoveryOptions(origin, enabled ? async (email, token) => { mail.push({ email, token }); } : null, storage),
-    database: memoryAdapter(records), secret: "synthetic-reset-only-secret-01234567890123456789", baseURL: "http://localhost:5000",
+    database: serializedMemory(records), secret: "synthetic-reset-only-secret-01234567890123456789", baseURL: "http://localhost:5000",
     logger: { level: "error", log: () => {} }, rateLimit: { enabled: false } });
   const server = createApp(toNodeHandler(auth), createAuthCapabilitiesRouter(enabled), origin, false).listen(0, "127.0.0.1");
   await new Promise<void>((resolve, reject) => { server.once("listening", resolve); server.once("error", reject); });
